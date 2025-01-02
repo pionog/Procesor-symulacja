@@ -44,23 +44,26 @@ public class MicrocodeListManager : MonoBehaviour
     {
         // Tworzenie kontenera dla wiersza
         GameObject rowContainer = new GameObject("RowContainer");
-        rowContainer.transform.SetParent(content);
+        rowContainer.transform.SetParent(content, false); // false oznacza zachowanie lokalnej skali
         RectTransform rectTransform = rowContainer.AddComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(0, 50); // Ustawienie sta³ego rozmiaru
-        rectTransform.anchorMin = new Vector2(0, 1); // Górny-lewy róg
+
+        // Dopasowanie szerokoœci do Content
+        rectTransform.anchorMin = new Vector2(0, 0); // Górny-lewy róg
         rectTransform.anchorMax = new Vector2(1, 1); // Górny-prawy róg
         rectTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: górny œrodek
+        rectTransform.sizeDelta = new Vector2(300, 30); // Wysokoœæ wiersza
 
+        // Dodanie uk³adu poziomego i wymuszanie dopasowania rozmiarów
         HorizontalLayoutGroup rowLayout = rowContainer.AddComponent<HorizontalLayoutGroup>();
-        rowLayout.childForceExpandWidth = false;
-        rowLayout.childForceExpandHeight = false;
-        rowLayout.childControlHeight = false;
-        rowLayout.childControlWidth = false;
-        rowLayout.childAlignment = TextAnchor.MiddleLeft;
+        rowLayout.childForceExpandWidth = false; // Brak rozci¹gania szerokoœci dzieci
+        rowLayout.childForceExpandHeight = true; // Rozci¹ganie wysokoœci dzieci
+        rowLayout.childControlWidth = true;     // Kontrolowanie szerokoœci dzieci
+        rowLayout.childControlHeight = true;    // Kontrolowanie wysokoœci dzieci
+        rowLayout.childAlignment = TextAnchor.UpperLeft;
 
         // Tworzenie przycisku mnemonika
         GameObject newButton = Instantiate(mnemonicButtonPrefab, rowContainer.transform);
-        TMP_Text buttonText = newButton.transform.GetComponentInChildren<TMP_Text>();
+        TMP_Text buttonText = newButton.GetComponentInChildren<TMP_Text>();
         if (buttonText != null)
         {
             buttonText.text = mnemonic;
@@ -75,17 +78,17 @@ public class MicrocodeListManager : MonoBehaviour
         optionContainer.transform.SetParent(rowContainer.transform);
 
         RectTransform optionsTransform = optionContainer.AddComponent<RectTransform>();
-        optionsTransform.sizeDelta = new Vector2(0, 50); // Ustawienie sta³ego rozmiaru
-        optionsTransform.anchorMin = new Vector2(0, 1); // Górny-lewy róg
+        optionsTransform.anchorMin = new Vector2(0, 0); // Górny-lewy róg
         optionsTransform.anchorMax = new Vector2(1, 1); // Górny-prawy róg
         optionsTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: górny œrodek
+        optionsTransform.sizeDelta = new Vector2(200, 30); // Rozmiar opcji mo¿e byæ sta³y lub dynamiczny
 
-        HorizontalLayoutGroup optionsRowLayout = optionContainer.AddComponent<HorizontalLayoutGroup>(); // Uk³ad opcji poziomo
+        HorizontalLayoutGroup optionsRowLayout = optionContainer.AddComponent<HorizontalLayoutGroup>();
         optionsRowLayout.childForceExpandWidth = false;
-        optionsRowLayout.childForceExpandHeight = false;
-        optionsRowLayout.childControlHeight = false;
-        optionsRowLayout.childControlWidth = false;
-        optionsRowLayout.childAlignment = TextAnchor.MiddleLeft;
+        optionsRowLayout.childForceExpandHeight = true;
+        optionsRowLayout.childControlWidth = true;
+        optionsRowLayout.childControlHeight = true;
+        optionsRowLayout.transform.localScale = new Vector3(1, 1, 1);
 
 
         // Ukryj kontener opcji na pocz¹tku
@@ -94,6 +97,8 @@ public class MicrocodeListManager : MonoBehaviour
         // Obs³uga klikniêcia przycisku mnemonika
         newButton.GetComponent<Button>().onClick.AddListener(() => ToggleOptions(mnemonic, optionContainer));
     }
+
+
 
     private void ToggleOptions(string mnemonic, GameObject optionContainer)
     {

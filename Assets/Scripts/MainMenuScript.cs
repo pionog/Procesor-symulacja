@@ -11,7 +11,6 @@ public class MainMenuScript : MonoBehaviour
     }
     public void ScoreButton()
     {
-        Debug.Log("Nacisnieto przycisk wynikow");
         ScoreEntry[] scores = new ScoreEntry[]
         {
             new ScoreEntry(150, "Player1"),
