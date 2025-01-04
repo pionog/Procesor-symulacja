@@ -4,15 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class RegisterGroup : MonoBehaviour
+public class RegisterGroup
 {
-    private Dictionary<string, Register> registers = new Dictionary<string, Register>();
+    private readonly string prefix;
+    private readonly Dictionary<string, Register> registers;
 
-    public RegisterGroup(string groupName, int count)
+    public RegisterGroup(string prefix, int count)
     {
-        for (int i = 0; i < count; i++)
+        this.prefix = prefix;
+        registers = new Dictionary<string, Register>();
+        registers[$"{prefix}0"] = new Register($"{prefix}0", 0);
+
+        for (int i = 1; i < count; i++)
         {
-            string registerName = $"{groupName}{i}";
+            string registerName = $"{prefix}{i}";
             registers[registerName] = new Register(registerName);
         }
     }
@@ -23,17 +28,17 @@ public class RegisterGroup : MonoBehaviour
         {
             return registers[name];
         }
-        throw new ArgumentException($"Register {name} does not exist in this group.");
+        throw new KeyNotFoundException($"Register {name} not found in group {prefix}.");
     }
 
-    public void SetRegisterValue(string name, int value)
+    public List<Register> GetAllRegisters()
     {
-        GetRegister(name).Value = value;
+        return registers.Values.ToList();
     }
 
-    public int GetRegisterValue(string name)
+    public List<string> GetRegisterNames()
     {
-        return GetRegister(name).Value;
+        return registers.Keys.ToList();
     }
 
     public override string ToString()
@@ -41,4 +46,3 @@ public class RegisterGroup : MonoBehaviour
         return string.Join(", ", registers.Values.Select(r => r.ToString()));
     }
 }
-
