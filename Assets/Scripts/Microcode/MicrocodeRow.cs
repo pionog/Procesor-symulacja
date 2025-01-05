@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MicrocodeRow : MonoBehaviour
+public class MicrocodeRow
 {
     public int Address { get; set; } // uAR
     public string Label { get; set; }
@@ -19,10 +19,15 @@ public class MicrocodeRow : MonoBehaviour
     public string MDest { get; set; }
     public string Regs { get; set; }
 
+    public MicrocodeRow() { 
+    
+    }
+
     public MicrocodeRow(int address)
     {
         Address = address;
     }
+
 
     public override string ToString()
     {

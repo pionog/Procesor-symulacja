@@ -8,6 +8,11 @@ public class MicrocodeListManager : MonoBehaviour
     public Transform content; // Referencja do Content w ScrollRect
     public GameObject mnemonicButtonPrefab; // Prefab przycisku mnemonika
     public GameObject optionButtonPrefab; // Prefab przycisku opcji
+    public MicrocodeManager MicrocodeManager;
+    public MicrocodeEditor MicrocodeEditor;
+    public TMP_InputField inputField;
+    public GameObject Parent;
+    public GameObject MicrocodeDetails;
 
     private List<string> mnemonics = new List<string>(); // Lista mnemoników
     private Dictionary<string, List<GameObject>> activeOptionButtons = new Dictionary<string, List<GameObject>>(); // Mapowanie mnemonik -> przyciski opcji
@@ -152,6 +157,11 @@ public class MicrocodeListManager : MonoBehaviour
     {
         Debug.Log($"Edycja mnemonika: {mnemonic}");
         // Logika edycji
+        MicrocodeEditor.microcodeTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
+        Debug.Log(MicrocodeEditor.microcodeTable.ToString());
+        MicrocodeEditor.LoadMicrocodeTable();
+        MicrocodeDetails.SetActive(true);
+        Parent.SetActive(false);
     }
 
     public void RemoveMnemonic(string mnemonic)
@@ -171,4 +181,14 @@ public class MicrocodeListManager : MonoBehaviour
 
         RefreshList();
     }
+
+    public void AddNewMnemonic() {
+        string mnemonic = inputField.text;
+        if (mnemonic != null)
+        {
+            MicrocodeManager.AddMicrocodeTable(mnemonic, new MicrocodeTable());
+            AddMnemonicButton(mnemonic);
+        }
+    }
+
 }

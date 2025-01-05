@@ -4,44 +4,50 @@ using UnityEngine;
 
 public class MicrocodeManager : MonoBehaviour
 {
-    // Odwo³anie do tabeli mikrokodów
-    public MicrocodeTable microcodeTable;
-
-    // Odwo³anie do zarz¹dcy rejestrów
-    private RegisterManager registerManager;
-
-    // Odwo³anie do wykonawcy mikrokodu
-    private MicrocodeExecutor microcodeExecutor;
+    // S³ownik przechowuj¹cy tabele mikrokodów dla ró¿nych mnemoników
+    private Dictionary<string, MicrocodeTable> microcodeTables;
 
     private void Awake()
     {
-        // Inicjalizacja obiektów
-        registerManager = RegisterManager.Instance;
-        microcodeTable = new MicrocodeTable(); // Mo¿esz ustawiæ w edytorze Unity lub stworzyæ dynamicznie
-        microcodeExecutor = new MicrocodeExecutor(registerManager, microcodeTable);
+        // Inicjalizacja s³ownika
+        microcodeTables = new Dictionary<string, MicrocodeTable>();
     }
 
-    // Dodawanie nowego wiersza mikrokodu
-    public void AddMicrocodeRow(MicrocodeRow row)
+    // Dodawanie istniej¹cej tabeli mikrokodów do s³ownika
+    public void AddMicrocodeTable(string mnemonic, MicrocodeTable table)
     {
-        microcodeTable.AddRow(row);
+        if (!microcodeTables.ContainsKey(mnemonic))
+        {
+            microcodeTables[mnemonic] = table;
+            Debug.Log($"Dodano tabelê mikrokodów dla mnemonika: {mnemonic}");
+        }
+        else
+        {
+            Debug.LogWarning($"Tabela mikrokodów dla mnemonika '{mnemonic}' ju¿ istnieje.");
+        }
     }
 
-    // Uruchamianie mikrokodu
-    public void ExecuteMicrocode()
+    // Pobieranie tabeli mikrokodów dla danego mnemonika
+    public MicrocodeTable GetMicrocodeTable(string mnemonic)
     {
-        microcodeExecutor.Execute();
+        if (microcodeTables.TryGetValue(mnemonic, out var table))
+        {
+            DebugAllMicrocodes();
+            return table;
+        }
+        else
+        {
+            Debug.LogError($"Tabela mikrokodów dla mnemonika '{mnemonic}' nie istnieje.");
+            return null;
+        }
     }
 
-    // Mo¿esz dodaæ metodê do czyszczenia tabeli mikrokodów
-    public void ClearMicrocodeTable()
+    // Debugowanie wszystkich tabel mikrokodów
+    public void DebugAllMicrocodes()
     {
-        microcodeTable = new MicrocodeTable();
-    }
-
-    // Funkcja do testowania dodawania mikrokodów i ich wyœwietlania
-    public void DebugMicrocodes()
-    {
-        Debug.Log(microcodeTable.ToString());
+        foreach (var kvp in microcodeTables)
+        {
+            Debug.Log($"Mnemonik: {kvp.Key}, Mikrokody:\n{kvp.Value}");
+        }
     }
 }

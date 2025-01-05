@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class MicrocodeTable : MonoBehaviour
+public class MicrocodeTable
 {
     private List<MicrocodeRow> rows = new List<MicrocodeRow>();
 
@@ -20,6 +20,11 @@ public class MicrocodeTable : MonoBehaviour
     public IEnumerable<MicrocodeRow> GetAllRows()
     {
         return rows;
+    }
+
+    public void Clear()
+    {
+        rows.Clear();
     }
 
     public override string ToString()
