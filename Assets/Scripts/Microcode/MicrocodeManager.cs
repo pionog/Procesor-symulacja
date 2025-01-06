@@ -32,7 +32,6 @@ public class MicrocodeManager : MonoBehaviour
     {
         if (microcodeTables.TryGetValue(mnemonic, out var table))
         {
-            DebugAllMicrocodes();
             return table;
         }
         else

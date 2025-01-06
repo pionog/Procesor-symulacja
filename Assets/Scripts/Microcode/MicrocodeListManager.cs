@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,12 +20,12 @@ public class MicrocodeListManager : MonoBehaviour
 
     void Start()
     {
-        // Przyk³adowe mnemoniki
-        mnemonics.Add("LOAD");
-        mnemonics.Add("STORE");
-        mnemonics.Add("ADD");
-        mnemonics.Add("SUB");
-        mnemonics.Add("STEPW7C");
+        //// Przyk³adowe mnemoniki
+        //mnemonics.Add("LOAD");
+        //mnemonics.Add("STORE");
+        //mnemonics.Add("ADD");
+        //mnemonics.Add("SUB");
+        //mnemonics.Add("STEPW7C");
 
         RefreshList();
     }
@@ -39,7 +40,7 @@ public class MicrocodeListManager : MonoBehaviour
         activeOptionButtons.Clear();
 
         // Dodaj przyciski mnemoników
-        foreach (var mnemonic in mnemonics)
+        foreach (var mnemonic in mnemonics.ToList())
         {
             AddMnemonicButton(mnemonic);
         }
@@ -47,6 +48,7 @@ public class MicrocodeListManager : MonoBehaviour
 
     private void AddMnemonicButton(string mnemonic)
     {
+
         // Tworzenie kontenera dla wiersza
         GameObject rowContainer = new GameObject("RowContainer");
         rowContainer.transform.SetParent(content, false); // false oznacza zachowanie lokalnej skali
@@ -157,8 +159,9 @@ public class MicrocodeListManager : MonoBehaviour
     {
         Debug.Log($"Edycja mnemonika: {mnemonic}");
         // Logika edycji
-        MicrocodeEditor.microcodeTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
-        Debug.Log(MicrocodeEditor.microcodeTable.ToString());
+        MicrocodeEditor.MicrocodeTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
+        MicrocodeEditor.Mnemonic = mnemonic;
+        Debug.Log(MicrocodeEditor.MicrocodeTable.ToString());
         MicrocodeEditor.LoadMicrocodeTable();
         MicrocodeDetails.SetActive(true);
         Parent.SetActive(false);
@@ -167,27 +170,45 @@ public class MicrocodeListManager : MonoBehaviour
     public void RemoveMnemonic(string mnemonic)
     {
         Debug.Log($"Usuwanie mnemonika: {mnemonic}");
-        mnemonics.Remove(mnemonic);
 
-        // Usuñ przyciski opcji, jeœli istniej¹
+
+        // Usuñ mnemonik z listy
+        if (mnemonics.Contains(mnemonic))
+        {
+            mnemonics.Remove(mnemonic);
+        }
+        else
+        {
+            Debug.LogWarning($"Mnemonik '{mnemonic}' nie istnieje na liœcie.");
+            return;
+        }
+
+        // Usuñ przyciski powi¹zane z mnemonikiem
         if (activeOptionButtons.ContainsKey(mnemonic))
         {
-            foreach (var optionButton in activeOptionButtons[mnemonic])
+            Debug.Log($"Usuwanie {activeOptionButtons[mnemonic].Count} przycisków powi¹zanych z '{mnemonic}'");
+            foreach (var button in activeOptionButtons[mnemonic])
             {
-                Destroy(optionButton);
+                Destroy(button);
             }
             activeOptionButtons.Remove(mnemonic);
         }
 
+        // Zaktualizuj listê w UI
         RefreshList();
     }
 
     public void AddNewMnemonic() {
         string mnemonic = inputField.text;
-        if (mnemonic != null)
+        if (mnemonic != null && mnemonic != "")
         {
-            MicrocodeManager.AddMicrocodeTable(mnemonic, new MicrocodeTable());
+            MicrocodeTable newMicrocodeTable = new MicrocodeTable();
+            MicrocodeRow row = new MicrocodeRow();
+            row.Label = mnemonic;
+            newMicrocodeTable.AddRow(row);
+            MicrocodeManager.AddMicrocodeTable(mnemonic, newMicrocodeTable);
             AddMnemonicButton(mnemonic);
+            mnemonics.Add(mnemonic);
         }
     }
 

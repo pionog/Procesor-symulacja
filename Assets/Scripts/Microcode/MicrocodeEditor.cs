@@ -8,11 +8,14 @@ using UnityEngine.UIElements;
 
 public class MicrocodeEditor : MonoBehaviour
 {
-    public Transform tableParent; // Kontener dla wierszy
-    public GameObject rowPrefab; // Prefab wiersza tabeli
-    public MicrocodeTable microcodeTable;
+    public Transform TableParent; // Kontener dla wierszy
+    public GameObject RowPrefab; // Prefab wiersza tabeli
+    public GameObject RowAliases;
+    public MicrocodeTable MicrocodeTable;
     public GameObject AddNewRowButton;
     private MicrocodeTable tempMicrocodeTable; // Tymczasowa tabela
+    public string Mnemonic { get; set; }
+    public TMP_Text MnemonicTitle;
 
 
     public void AddRow()
@@ -22,9 +25,9 @@ public class MicrocodeEditor : MonoBehaviour
         var newRow = new MicrocodeRow();
         tempMicrocodeTable.AddRow(newRow);
 
-        var rowUI = Instantiate(rowPrefab, tableParent);
+        var rowUI = Instantiate(RowPrefab, TableParent);
         RectTransform rowRectTransform = rowUI.GetComponent<RectTransform>();
-        rowRectTransform.sizeDelta = new Vector2(tableParent.GetComponent<RectTransform>().rect.width, rowRectTransform.sizeDelta.y);
+        rowRectTransform.sizeDelta = new Vector2(TableParent.GetComponent<RectTransform>().rect.width, rowRectTransform.sizeDelta.y);
 
         AddNewRowButton.transform.SetAsLastSibling();
 
@@ -101,18 +104,24 @@ public class MicrocodeEditor : MonoBehaviour
 
     public void LoadMicrocodeTable()
     {
+        MnemonicTitle.text = Mnemonic;
+
         // Stwórz kopiê tabeli mikrokodu
         tempMicrocodeTable = new MicrocodeTable();
-        foreach (var row in microcodeTable.GetAllRows())
+        foreach (var row in MicrocodeTable.GetAllRows())
         {
             tempMicrocodeTable.AddRow(new MicrocodeRow
             {
+                Address = row.Address,
+                Label = row.Label,
                 ALU = row.ALU,
                 S1 = row.S1,
                 S2 = row.S2,
                 Dest = row.Dest,
+                ExtIR = row.ExtIR,
                 Const = row.Const,
                 JCond = row.JCond,
+                Adr = row.Adr,
                 Mem = row.Mem,
                 MAdr = row.MAdr,
                 MDest = row.MDest,
@@ -120,8 +129,9 @@ public class MicrocodeEditor : MonoBehaviour
             });
         }
 
+
         // Wype³nij UI na podstawie tempMicrocodeTable
-        foreach (Transform child in tableParent)
+        foreach (Transform child in TableParent)
         {
             if (child.gameObject != AddNewRowButton)
             {
@@ -129,11 +139,15 @@ public class MicrocodeEditor : MonoBehaviour
             }
         }
 
+        var rowAliases = Instantiate(RowAliases, TableParent);
+        RectTransform rowAliasesRectTransform = rowAliases.GetComponent<RectTransform>();
+        rowAliasesRectTransform.sizeDelta = new Vector2(TableParent.GetComponent<RectTransform>().rect.width, rowAliasesRectTransform.sizeDelta.y);
+
         foreach (var row in tempMicrocodeTable.GetAllRows())
         {
-            var rowUI = Instantiate(rowPrefab, tableParent);
+            var rowUI = Instantiate(RowPrefab, TableParent);
             RectTransform rowRectTransform = rowUI.GetComponent<RectTransform>();
-            rowRectTransform.sizeDelta = new Vector2(tableParent.GetComponent<RectTransform>().rect.width, rowRectTransform.sizeDelta.y);
+            rowRectTransform.sizeDelta = new Vector2(TableParent.GetComponent<RectTransform>().rect.width, rowRectTransform.sizeDelta.y);
 
             var dropdowns = rowUI.GetComponentsInChildren<TMP_Dropdown>();
             var ConstField = rowUI.GetComponentInChildren<TMP_InputField>();
@@ -167,23 +181,27 @@ public class MicrocodeEditor : MonoBehaviour
 
     public void SaveChanges()
     {
-        microcodeTable.Clear();
+        MicrocodeTable.Clear();
         foreach (var row in tempMicrocodeTable.GetAllRows())
         {
             var currentRow = new MicrocodeRow
             {
+                Address = row.Address,
+                Label = row.Label,
                 ALU = row.ALU,
                 S1 = row.S1,
                 S2 = row.S2,
                 Dest = row.Dest,
+                ExtIR = row.ExtIR,
                 Const = row.Const,
                 JCond = row.JCond,
+                Adr = row.Adr,
                 Mem = row.Mem,
                 MAdr = row.MAdr,
                 MDest = row.MDest,
                 Regs = row.Regs
             };
-            microcodeTable.AddRow(currentRow);
+            MicrocodeTable.AddRow(currentRow);
         }
 
         Debug.Log("Zmiany zosta³y zapisane.");
@@ -198,6 +216,6 @@ public class MicrocodeEditor : MonoBehaviour
 
     public void PrintTable()
     {
-        Debug.Log(microcodeTable.ToString());
+        Debug.Log(MicrocodeTable.ToString());
     }
 }
