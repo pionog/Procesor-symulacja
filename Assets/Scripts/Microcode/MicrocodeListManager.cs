@@ -15,12 +15,12 @@ public class MicrocodeListManager : MonoBehaviour
     public GameObject Parent;
     public GameObject MicrocodeDetails;
 
-    private List<string> mnemonics = new List<string>(); // Lista mnemoników
+    private List<string> mnemonics = new List<string>(); // Lista mnemonikï¿½w
     private Dictionary<string, List<GameObject>> activeOptionButtons = new Dictionary<string, List<GameObject>>(); // Mapowanie mnemonik -> przyciski opcji
 
     void Start()
     {
-        //// Przyk³adowe mnemoniki
+        //// Przykï¿½adowe mnemoniki
         //mnemonics.Add("LOAD");
         //mnemonics.Add("STORE");
         //mnemonics.Add("ADD");
@@ -30,16 +30,20 @@ public class MicrocodeListManager : MonoBehaviour
         RefreshList();
     }
 
+    public List<string> getMnemonics() {
+        return mnemonics;
+    }
+
     public void RefreshList()
     {
-        // Usuñ istniej¹ce elementy
+        // Usuï¿½ istniejï¿½ce elementy
         foreach (Transform child in content)
         {
             Destroy(child.gameObject);
         }
         activeOptionButtons.Clear();
 
-        // Dodaj przyciski mnemoników
+        // Dodaj przyciski mnemonikï¿½w
         foreach (var mnemonic in mnemonics.ToList())
         {
             AddMnemonicButton(mnemonic);
@@ -54,18 +58,18 @@ public class MicrocodeListManager : MonoBehaviour
         rowContainer.transform.SetParent(content, false); // false oznacza zachowanie lokalnej skali
         RectTransform rectTransform = rowContainer.AddComponent<RectTransform>();
 
-        // Dopasowanie szerokoœci do Content
-        rectTransform.anchorMin = new Vector2(0, 0); // Górny-lewy róg
-        rectTransform.anchorMax = new Vector2(1, 1); // Górny-prawy róg
-        rectTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: górny œrodek
-        rectTransform.sizeDelta = new Vector2(300, 30); // Wysokoœæ wiersza
+        // Dopasowanie szerokoï¿½ci do Content
+        rectTransform.anchorMin = new Vector2(0, 0); // Gï¿½rny-lewy rï¿½g
+        rectTransform.anchorMax = new Vector2(1, 1); // Gï¿½rny-prawy rï¿½g
+        rectTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: gï¿½rny ï¿½rodek
+        rectTransform.sizeDelta = new Vector2(300, 30); // Wysokoï¿½ï¿½ wiersza
 
-        // Dodanie uk³adu poziomego i wymuszanie dopasowania rozmiarów
+        // Dodanie ukï¿½adu poziomego i wymuszanie dopasowania rozmiarï¿½w
         HorizontalLayoutGroup rowLayout = rowContainer.AddComponent<HorizontalLayoutGroup>();
-        rowLayout.childForceExpandWidth = false; // Brak rozci¹gania szerokoœci dzieci
-        rowLayout.childForceExpandHeight = true; // Rozci¹ganie wysokoœci dzieci
-        rowLayout.childControlWidth = true;     // Kontrolowanie szerokoœci dzieci
-        rowLayout.childControlHeight = true;    // Kontrolowanie wysokoœci dzieci
+        rowLayout.childForceExpandWidth = false; // Brak rozciï¿½gania szerokoï¿½ci dzieci
+        rowLayout.childForceExpandHeight = true; // Rozciï¿½ganie wysokoï¿½ci dzieci
+        rowLayout.childControlWidth = true;     // Kontrolowanie szerokoï¿½ci dzieci
+        rowLayout.childControlHeight = true;    // Kontrolowanie wysokoï¿½ci dzieci
         rowLayout.childAlignment = TextAnchor.UpperLeft;
 
         // Tworzenie przycisku mnemonika
@@ -85,10 +89,10 @@ public class MicrocodeListManager : MonoBehaviour
         optionContainer.transform.SetParent(rowContainer.transform);
 
         RectTransform optionsTransform = optionContainer.AddComponent<RectTransform>();
-        optionsTransform.anchorMin = new Vector2(0, 0); // Górny-lewy róg
-        optionsTransform.anchorMax = new Vector2(1, 1); // Górny-prawy róg
-        optionsTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: górny œrodek
-        optionsTransform.sizeDelta = new Vector2(200, 30); // Rozmiar opcji mo¿e byæ sta³y lub dynamiczny
+        optionsTransform.anchorMin = new Vector2(0, 0); // Gï¿½rny-lewy rï¿½g
+        optionsTransform.anchorMax = new Vector2(1, 1); // Gï¿½rny-prawy rï¿½g
+        optionsTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: gï¿½rny ï¿½rodek
+        optionsTransform.sizeDelta = new Vector2(200, 30); // Rozmiar opcji moï¿½e byï¿½ staï¿½y lub dynamiczny
 
         HorizontalLayoutGroup optionsRowLayout = optionContainer.AddComponent<HorizontalLayoutGroup>();
         optionsRowLayout.childForceExpandWidth = false;
@@ -98,10 +102,10 @@ public class MicrocodeListManager : MonoBehaviour
         optionsRowLayout.transform.localScale = new Vector3(1, 1, 1);
 
 
-        // Ukryj kontener opcji na pocz¹tku
+        // Ukryj kontener opcji na poczï¿½tku
         optionContainer.SetActive(false);
 
-        // Obs³uga klikniêcia przycisku mnemonika
+        // Obsï¿½uga klikniï¿½cia przycisku mnemonika
         newButton.GetComponent<Button>().onClick.AddListener(() => ToggleOptions(mnemonic, optionContainer));
     }
 
@@ -109,14 +113,14 @@ public class MicrocodeListManager : MonoBehaviour
 
     private void ToggleOptions(string mnemonic, GameObject optionContainer)
     {
-        // Jeœli kontener opcji jest aktywny, ukryj go
+        // Jeï¿½li kontener opcji jest aktywny, ukryj go
         if (optionContainer.activeSelf)
         {
             optionContainer.SetActive(false);
             return;
         }
 
-        // Wyczyœæ poprzednie przyciski opcji
+        // Wyczyï¿½ï¿½ poprzednie przyciski opcji
         foreach (Transform child in optionContainer.transform)
         {
             Destroy(child.gameObject);
@@ -143,7 +147,7 @@ public class MicrocodeListManager : MonoBehaviour
         TMP_Text deleteButtonText = deleteButton.transform.GetComponentInChildren<TMP_Text>();
         if (deleteButtonText != null)
         {
-            deleteButtonText.text = "Usuñ";
+            deleteButtonText.text = "Usuï¿½";
         }
         else
         {
@@ -151,7 +155,7 @@ public class MicrocodeListManager : MonoBehaviour
         }
         deleteButton.GetComponent<Button>().onClick.AddListener(() => RemoveMnemonic(mnemonic));
 
-        // Poka¿ kontener opcji
+        // Pokaï¿½ kontener opcji
         optionContainer.SetActive(true);
     }
 
@@ -172,21 +176,21 @@ public class MicrocodeListManager : MonoBehaviour
         Debug.Log($"Usuwanie mnemonika: {mnemonic}");
 
 
-        // Usuñ mnemonik z listy
+        // Usuï¿½ mnemonik z listy
         if (mnemonics.Contains(mnemonic))
         {
             mnemonics.Remove(mnemonic);
         }
         else
         {
-            Debug.LogWarning($"Mnemonik '{mnemonic}' nie istnieje na liœcie.");
+            Debug.LogWarning($"Mnemonik '{mnemonic}' nie istnieje na liï¿½cie.");
             return;
         }
 
-        // Usuñ przyciski powi¹zane z mnemonikiem
+        // Usuï¿½ przyciski powiï¿½zane z mnemonikiem
         if (activeOptionButtons.ContainsKey(mnemonic))
         {
-            Debug.Log($"Usuwanie {activeOptionButtons[mnemonic].Count} przycisków powi¹zanych z '{mnemonic}'");
+            Debug.Log($"Usuwanie {activeOptionButtons[mnemonic].Count} przyciskï¿½w powiï¿½zanych z '{mnemonic}'");
             foreach (var button in activeOptionButtons[mnemonic])
             {
                 Destroy(button);
@@ -194,7 +198,7 @@ public class MicrocodeListManager : MonoBehaviour
             activeOptionButtons.Remove(mnemonic);
         }
 
-        // Zaktualizuj listê w UI
+        // Zaktualizuj listï¿½ w UI
         RefreshList();
     }
 
