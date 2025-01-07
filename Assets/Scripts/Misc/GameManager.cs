@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,6 +19,13 @@ public class GameManager : MonoBehaviour
     public TMP_InputField inputFieldPC;
     public TMP_InputField inputFieldMAR;
     public TMP_InputField inputFieldMDR;
+
+    public TMP_Text Score;
+    private int gameScore = 0;
+    public Button ClockButton;
+    public Button RewindButton;
+    public Toggle MultipleCyclesToggle;
+    public TMP_InputField Cycles;
 
 
     private void Awake()
@@ -44,6 +53,7 @@ public class GameManager : MonoBehaviour
 
         // Pobierz rejestry z RegisterManager
         PopulateRegisters();
+        Score.text = gameScore.ToString();
     }
 
     public void StartGame()
@@ -109,7 +119,7 @@ public class GameManager : MonoBehaviour
         tmpText.text = text;
     }
 
-    void UpdateInputFields()
+    private void UpdateInputFields()
     {
         inputFieldA.text = RegisterManager.Instance.GetRegisterValue("A").ToString("X8");  // "X8" formatuje na 8 cyfr hex
         inputFieldB.text = RegisterManager.Instance.GetRegisterValue("B").ToString("X8");
@@ -119,5 +129,18 @@ public class GameManager : MonoBehaviour
         inputFieldPC.text = RegisterManager.Instance.GetRegisterValue("PC").ToString("X8");
         inputFieldMAR.text = RegisterManager.Instance.GetRegisterValue("MAR").ToString("X8");
         inputFieldMDR.text = RegisterManager.Instance.GetRegisterValue("MDR").ToString("X8");
+    }
+
+    public void UpdateScore(bool isForward) {
+        bool cyclesOn = MultipleCyclesToggle.isOn;
+        int cycles = cyclesOn ? Int32.TryParse(Cycles.text, out cycles) ? cycles : 0 : 0;
+        int step = isForward ? 1 : -1;
+        if (cyclesOn) AddScore(step * cycles); else AddScore(step * 1);
+    }
+
+    public void AddScore(int number) {
+        if (gameScore + number < 0) {Debug.LogError("Niedozwolona operacja!"); return; }
+        gameScore += number;
+        Score.text = gameScore.ToString();
     }
 }
