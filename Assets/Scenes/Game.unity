@@ -5605,12 +5605,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 667265884}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2f8588fe2a4ae9479b30b15daa9512d, type: 3}
+  m_Script: {fileID: 11500000, guid: ade5a91f589d78244af48e872db1124e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  content: {fileID: 0}
-  mnemonicButtonPrefab: {fileID: 0}
-  optionButtonPrefab: {fileID: 0}
 --- !u!1001 &671510737
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8006,6 +8003,7 @@ MonoBehaviour:
   inputField: {fileID: 245449307}
   Parent: {fileID: 917763172}
   MicrocodeDetails: {fileID: 312331734}
+  ViewcodeGlobalManager: {fileID: 667265884}
 --- !u!114 &984122901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15550,6 +15548,7 @@ MonoBehaviour:
   content: {fileID: 808174110}
   mnemonicButtonPrefab: {fileID: 1581840630622953699, guid: 5798ee4120fff30448cf50ceb3400d6f, type: 3}
   optionButtonPrefab: {fileID: 1581840630622953699, guid: 5798ee4120fff30448cf50ceb3400d6f, type: 3}
+  ViewcodeGlobalManager: {fileID: 667265884}
 --- !u!114 &1990131954
 MonoBehaviour:
   m_ObjectHideFlags: 0

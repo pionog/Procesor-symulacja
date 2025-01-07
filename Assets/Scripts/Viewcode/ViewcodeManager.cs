@@ -11,6 +11,17 @@ public class ViewcodeManager : MonoBehaviour
     public Transform content; // Referencja do Content w ScrollRect
     public GameObject mnemonicButtonPrefab; // Prefab przycisku mnemonika
     public GameObject optionButtonPrefab; // Prefab przycisku opcji
+    public GameObject ViewcodeGlobalManager;
+
+    void OnEnable() {
+        List<string> instructionsToDelete = ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().getInstructionsToDelete();
+
+        foreach(var instruction in instructionsToDelete) {
+            RemoveAllInstructions(instruction);
+        }
+
+        ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().clearInstructionsToDelete();
+    }
 
     public void createListOfInstructions(){
         for (int i = content.childCount - 1; i >= 0; i--){
@@ -182,6 +193,11 @@ public class ViewcodeManager : MonoBehaviour
 
         //Mozna chyba po prostu usuwać ten optionContainer, tak myślę
         Destroy(optionContainer);
+        createListOfInstructions();
+    }
+
+    public void RemoveAllInstructions(string instruction){
+        instructionList.RemoveAll(i => i == instruction);
         createListOfInstructions();
     }
 

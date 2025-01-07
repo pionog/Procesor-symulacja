@@ -14,6 +14,7 @@ public class MicrocodeListManager : MonoBehaviour
     public TMP_InputField inputField;
     public GameObject Parent;
     public GameObject MicrocodeDetails;
+    public GameObject ViewcodeGlobalManager;
 
     private List<string> mnemonics = new List<string>(); // Lista mnemonik�w
     private Dictionary<string, List<GameObject>> activeOptionButtons = new Dictionary<string, List<GameObject>>(); // Mapowanie mnemonik -> przyciski opcji
@@ -197,6 +198,8 @@ public class MicrocodeListManager : MonoBehaviour
             }
             activeOptionButtons.Remove(mnemonic);
         }
+
+        ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().addInstructionToDelete(mnemonic);
 
         // Zaktualizuj list� w UI
         RefreshList();
