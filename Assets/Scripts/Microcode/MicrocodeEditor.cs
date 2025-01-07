@@ -16,6 +16,8 @@ public class MicrocodeEditor : MonoBehaviour
     private MicrocodeTable tempMicrocodeTable; // Tymczasowa tabela
     public string Mnemonic { get; set; }
     public TMP_Text MnemonicTitle;
+    public ToggleGroup mnemonicToggleGroup;
+    public TMP_Text mnemonicRegistersNumber;
 
 
     public void AddRow()
@@ -177,6 +179,12 @@ public class MicrocodeEditor : MonoBehaviour
         }
 
         AddNewRowButton.transform.SetAsLastSibling();
+
+        mnemonicRegistersNumber.text = MicrocodeTable.GetRegistersNumber().ToString();
+        int toggleNumber = MicrocodeTable.GetMicrocodeType();
+        Debug.Log(toggleNumber.ToString());
+        SetToggleSelectedValue(toggleNumber.ToString());
+
     }
 
     public void SaveChanges()
@@ -211,6 +219,57 @@ public class MicrocodeEditor : MonoBehaviour
     {
         Debug.Log("Zmiany zosta³y anulowane.");
         // Mo¿esz tutaj dodaæ logikê powrotu do poprzedniego ekranu
+    }
+
+    public string GetToggleSelectedValue()
+    {
+        UnityEngine.UI.Toggle activeToggle = mnemonicToggleGroup.ActiveToggles().FirstOrDefault();
+
+        if (activeToggle != null)
+        {
+            return activeToggle.name; // U¿yj pola "name" jako wartoœci
+        }
+
+        Debug.LogWarning("Nie wybrano ¿adnego Toggle w grupie!");
+        return null;
+    }
+
+    public void SetToggleSelectedValue(string value)
+    {
+        // ZnajdŸ Toggle w grupie, który ma nazwê pasuj¹c¹ do wartoœci
+        bool changed = false;
+        var group = mnemonicToggleGroup.GetComponentsInChildren<UnityEngine.UI.Toggle>();
+        foreach (var toggle in group)
+        {
+            Debug.Log("Wchodze tutaj lalala");
+            Debug.Log(toggle.name);
+            if (toggle.name == value)
+            {
+                toggle.isOn = true; // Ustaw jako aktywny
+                changed = true;
+            }
+            else toggle.isOn = false;
+        }
+        if (!changed) {
+            group[0].isOn = true;
+        }
+
+        Debug.LogWarning($"Nie znaleziono Toggle o nazwie: {value}");
+    }
+
+    public void SetMnemonicType() { 
+        int type = int.Parse(GetToggleSelectedValue());
+        int registersNumber = int.Parse(mnemonicRegistersNumber.text);
+        MicrocodeTable.SetRegistersNumber(registersNumber);
+        MicrocodeTable.SetMicrocodeType(type);
+    }
+    public void changeResgistersNumber(bool add) {
+        int number = add ? 1 : -1;
+        int registersNumber = int.Parse(mnemonicRegistersNumber.text) + number;
+        if (0 <= registersNumber && registersNumber < 5)
+        {
+            mnemonicRegistersNumber.text = (registersNumber).ToString();
+        }
     }
 
 

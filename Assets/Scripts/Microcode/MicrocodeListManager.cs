@@ -167,8 +167,9 @@ public class MicrocodeListManager : MonoBehaviour
         MicrocodeEditor.MicrocodeTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
         MicrocodeEditor.Mnemonic = mnemonic;
         Debug.Log(MicrocodeEditor.MicrocodeTable.ToString());
-        MicrocodeEditor.LoadMicrocodeTable();
+        
         MicrocodeDetails.SetActive(true);
+        MicrocodeEditor.LoadMicrocodeTable();
         Parent.SetActive(false);
     }
 

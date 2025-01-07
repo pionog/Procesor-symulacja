@@ -6,6 +6,8 @@ using UnityEngine;
 public class MicrocodeTable
 {
     private List<MicrocodeRow> rows = new List<MicrocodeRow>();
+    private int MicrocodeType = 0; // 0 - R type,   1 - I Type, 2 - J Type
+    private int RegistersNumber = 2;
 
     public void AddRow(MicrocodeRow row)
     {
@@ -15,6 +17,22 @@ public class MicrocodeTable
     public MicrocodeRow GetRow(int address)
     {
         return rows.FirstOrDefault(r => r.Address == address);
+    }
+    public int GetMicrocodeType() {
+        Debug.Log("Odczyta³em nastêpuj¹c¹ wartoœæ typu mnemonika: " + MicrocodeType.ToString());
+        return MicrocodeType;
+    }
+    public void SetMicrocodeType(int type) {
+        MicrocodeType = type;
+        Debug.Log("Zapisujê nastêpuj¹c¹ wartoœæ typu mnemonika: " + MicrocodeType.ToString());
+    }
+    public int GetRegistersNumber()
+    {
+        return RegistersNumber;
+    }
+    public void SetRegistersNumber(int registersNumber)
+    {
+        RegistersNumber = registersNumber;
     }
 
     public IEnumerable<MicrocodeRow> GetAllRows()
