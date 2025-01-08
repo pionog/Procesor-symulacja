@@ -9561,7 +9561,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -273.5328}
+  m_SizeDelta: {x: 0, y: -249.92657}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &808174111
 MonoBehaviour:
@@ -17594,7 +17594,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 91046667}
   m_HandleRect: {fileID: 91046665}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -19179,7 +19179,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.8
+  m_fontSize: 20.75
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -20909,6 +20909,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   content: {fileID: 808174110}
   mnemonicButtonPrefab: {fileID: 1581840630622953699, guid: 5798ee4120fff30448cf50ceb3400d6f, type: 3}
+  InstructionPrefab: {fileID: 7073512307024397440, guid: 50a3cfc42c8d6df4b94d73166e7960f6, type: 3}
   optionButtonPrefab: {fileID: 1581840630622953699, guid: 5798ee4120fff30448cf50ceb3400d6f, type: 3}
   ViewcodeGlobalManager: {fileID: 667265884}
 --- !u!114 &1990131954

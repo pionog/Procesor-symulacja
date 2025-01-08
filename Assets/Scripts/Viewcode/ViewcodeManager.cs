@@ -10,6 +10,7 @@ public class ViewcodeManager : MonoBehaviour
 
     public Transform content; // Referencja do Content w ScrollRect
     public GameObject mnemonicButtonPrefab; // Prefab przycisku mnemonika
+    public GameObject InstructionPrefab; // Prefab definiowania instrukcji
     public GameObject optionButtonPrefab; // Prefab przycisku opcji
     public GameObject ViewcodeGlobalManager;
 
@@ -23,74 +24,69 @@ public class ViewcodeManager : MonoBehaviour
         ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().clearInstructionsToDelete();
     }
 
-    public void createListOfInstructions(){
-        for (int i = content.childCount - 1; i >= 0; i--){
+    public void createListOfInstructions()
+    {
+        // Usuń istniejące dzieci w Content
+        for (int i = content.childCount - 1; i >= 0; i--)
+        {
             Destroy(content.GetChild(i).gameObject);
         }
 
         int index = 0;
 
-        foreach(var instruction in instructionList){
+        foreach (var instruction in instructionList)
+        {
+            // Tworzenie głównego kontenera dla wiersza
             GameObject rowContainer = new GameObject("RowContainer");
+            rowContainer.transform.SetParent(content, false);
 
-            int currentIndex = index;
+            RectTransform rowContainerTransform = rowContainer.AddComponent<RectTransform>();
+            rowContainerTransform.sizeDelta = new Vector2(500, 30); // Dopasuj rozmiar kontenera wiersza
 
-            rowContainer.transform.SetParent(content, false); // false oznacza zachowanie lokalnej skali
-
-            RectTransform rectTransform = rowContainer.AddComponent<RectTransform>();
-
-            // Dopasowanie szeroko�ci do Content
-            rectTransform.anchorMin = new Vector2(0, 0); // G�rny-lewy r�g
-            rectTransform.anchorMax = new Vector2(1, 1); // G�rny-prawy r�g
-            rectTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: g�rny �rodek
-            rectTransform.sizeDelta = new Vector2(300, 30); // Wysoko�� wiersza
-
-            // Dodanie uk�adu poziomego i wymuszanie dopasowania rozmiar�w
             HorizontalLayoutGroup rowLayout = rowContainer.AddComponent<HorizontalLayoutGroup>();
+            rowLayout.childControlWidth = false;
+            rowLayout.childControlHeight = false;
+            rowLayout.childForceExpandWidth = false;
+            rowLayout.childForceExpandHeight = false;
 
-            rowLayout.childForceExpandWidth = false; // Brak rozci�gania szeroko�ci dzieci
-            rowLayout.childForceExpandHeight = true; // Rozci�ganie wysoko�ci dzieci
-            rowLayout.childControlWidth = true;     // Kontrolowanie szeroko�ci dzieci
-            rowLayout.childControlHeight = true;    // Kontrolowanie wysoko�ci dzieci
-            rowLayout.childAlignment = TextAnchor.UpperLeft;
+            // Utwórz InstructionRow w RowContainer
+            GameObject instructionRow = Instantiate(InstructionPrefab, rowContainer.transform);
 
-            // Tworzenie przycisku mnemonika
-            GameObject newButton = Instantiate(mnemonicButtonPrefab, rowContainer.transform);
-            TMP_Text buttonText = newButton.GetComponentInChildren<TMP_Text>();
+            // Znajdź komponenty w prefabrykacie InstructionRow
+            TMP_InputField labelInputField = instructionRow.transform.Find("LabelInputField").GetComponent<TMP_InputField>();
+            Button mnemonicButton = instructionRow.transform.Find("MnemonicButton").GetComponent<Button>();
+            TMP_InputField instructionInputField = instructionRow.transform.Find("InstructionInputField").GetComponent<TMP_InputField>();
 
-            if (buttonText != null){
-                buttonText.text = instruction;
+            if (labelInputField == null || mnemonicButton == null || instructionInputField == null)
+            {
+                Debug.LogError("Prefab InstructionRow nie zawiera wszystkich wymaganych komponentów!");
+                continue;
             }
-            else{
-                Debug.LogError("Prefab przycisku nie ma komponentu TMP_Text jako dziecko!");
-            }
 
-            // Kontener na przyciski opcji
+            // Ustaw wartości w polach i przycisku
+            labelInputField.text = ""; // Możesz zmienić tekst na coś sensownego
+            instructionInputField.text = ""; // Instrukcja dla pola input
+
+            mnemonicButton.GetComponentInChildren<TMP_Text>().text = $"{instruction}"; // Ustaw tekst przycisku
+
+            // Dodaj kontener opcji (OptionContainer) w RowContainer
             GameObject optionContainer = new GameObject("OptionContainer");
-
-            optionContainer.transform.SetParent(rowContainer.transform);
+            optionContainer.transform.SetParent(rowContainer.transform, false);
 
             RectTransform optionsTransform = optionContainer.AddComponent<RectTransform>();
-
-            optionsTransform.anchorMin = new Vector2(0, 0); // G�rny-lewy r�g
-            optionsTransform.anchorMax = new Vector2(1, 1); // G�rny-prawy r�g
-            optionsTransform.pivot = new Vector2(0.5f, 1);  // Punkt odniesienia: g�rny �rodek
-            optionsTransform.sizeDelta = new Vector2(200, 30); // Rozmiar opcji mo�e by� sta�y lub dynamiczny
+            optionsTransform.sizeDelta = new Vector2(200, 30);
 
             HorizontalLayoutGroup optionsRowLayout = optionContainer.AddComponent<HorizontalLayoutGroup>();
-
             optionsRowLayout.childForceExpandWidth = false;
             optionsRowLayout.childForceExpandHeight = true;
             optionsRowLayout.childControlWidth = true;
             optionsRowLayout.childControlHeight = true;
-            optionsRowLayout.transform.localScale = new Vector3(1, 1, 1);
 
+            optionContainer.SetActive(false); // Ukryj kontener opcji na początku
 
-            // Ukryj kontener opcji na pocz�tku
-            optionContainer.SetActive(false);
-
-            // Obs�uga klikni�cia przycisku mnemonika
-            newButton.GetComponent<Button>().onClick.AddListener(() => ToggleOptions(instruction, optionContainer, currentIndex));
+            // Obsługa kliknięcia przycisku MnemonicButton
+            int currentIndex = index; // Potrzebne, by zamknąć zmienną w lambdzie
+            mnemonicButton.onClick.AddListener(() => ToggleOptions(instruction, optionContainer, currentIndex));
 
             index++;
         }
@@ -111,19 +107,19 @@ public class ViewcodeManager : MonoBehaviour
 
         // Dodaj przyciski opcji
 
-        //Przycisk edycji
-        GameObject editButton = Instantiate(optionButtonPrefab, optionContainer.transform);
+        ////Przycisk edycji
+        //GameObject editButton = Instantiate(optionButtonPrefab, optionContainer.transform);
 
-        TMP_Text buttonText = editButton.transform.GetComponentInChildren<TMP_Text>();
+        //TMP_Text buttonText = editButton.transform.GetComponentInChildren<TMP_Text>();
 
-        if (buttonText != null){
-            buttonText.text = "Edytuj";
-        }
-        else{
-            Debug.LogError("Prefab przycisku nie ma komponentu TMP_Text jako dziecko!");
-        }
+        //if (buttonText != null){
+        //    buttonText.text = "Edytuj";
+        //}
+        //else{
+        //    Debug.LogError("Prefab przycisku nie ma komponentu TMP_Text jako dziecko!");
+        //}
 
-        editButton.GetComponent<Button>().onClick.AddListener(() => EditInstructionArguments(instruction));
+        //editButton.GetComponent<Button>().onClick.AddListener(() => EditInstructionArguments(instruction));
 
         //Przycisk usuwania
         GameObject deleteButton = Instantiate(optionButtonPrefab, optionContainer.transform);
