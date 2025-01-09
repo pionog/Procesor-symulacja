@@ -15340,6 +15340,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1475668964}
   m_CullTransparentMesh: 1
+--- !u!1 &1485829798
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1485829800}
+  - component: {fileID: 1485829799}
+  m_Layer: 0
+  m_Name: InstructionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1485829799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485829798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25d8eafee1a1a6f498218d4cc4b9c6d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1485829800
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485829798}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 128.87338, y: 119.71177, z: 1.8439773}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1498289149
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20907,11 +20951,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2f8588fe2a4ae9479b30b15daa9512d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InstructionManager: {fileID: 1485829799}
   content: {fileID: 808174110}
   mnemonicButtonPrefab: {fileID: 1581840630622953699, guid: 5798ee4120fff30448cf50ceb3400d6f, type: 3}
   InstructionPrefab: {fileID: 7073512307024397440, guid: 50a3cfc42c8d6df4b94d73166e7960f6, type: 3}
   optionButtonPrefab: {fileID: 1581840630622953699, guid: 5798ee4120fff30448cf50ceb3400d6f, type: 3}
   ViewcodeGlobalManager: {fileID: 667265884}
+  dropdown: {fileID: 376817100}
 --- !u!114 &1990131954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23316,6 +23362,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 667265886}
   - {fileID: 1700581502}
+  - {fileID: 1485829800}
   - {fileID: 1614230435}
   - {fileID: 696519758}
   - {fileID: 1712195982}

@@ -12,6 +12,13 @@ public class ViewcodeAddInstruction : MonoBehaviour
     [SerializeField] private TMP_Dropdown dropdown; 
 
     public void addNewInstruction(){
-        InstructionDisplay.GetComponent<ViewcodeManager>().AddNewInstruction(dropdown.options[dropdown.value].text);
+        if (dropdown.options.Count > 0)
+        {
+            InstructionDisplay.GetComponent<ViewcodeManager>().AddNewInstruction(dropdown.options[dropdown.value].text);
+        }
+        else
+        {
+            throw new System.Exception("There is no mnemonic that can be added. Create one.");
+        }
     }
 }

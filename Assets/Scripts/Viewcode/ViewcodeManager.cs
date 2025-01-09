@@ -7,12 +7,14 @@ using UnityEngine.UI;
 public class ViewcodeManager : MonoBehaviour
 {
     private List<string[]> instructionList = new List<string[]>();
+    public InstructionManager InstructionManager;
 
     public Transform content; // Referencja do Content w ScrollRect
     public GameObject mnemonicButtonPrefab; // Prefab przycisku mnemonika
     public GameObject InstructionPrefab; // Prefab definiowania instrukcji
     public GameObject optionButtonPrefab; // Prefab przycisku opcji
     public GameObject ViewcodeGlobalManager;
+    public TMP_Dropdown dropdown;
 
     void OnEnable() {
         List<string> instructionsToDelete = ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().getInstructionsToDelete();
@@ -33,6 +35,7 @@ public class ViewcodeManager : MonoBehaviour
         }
 
         int index = 0;
+        
 
         foreach (var instruction in instructionList)
         {
@@ -72,15 +75,13 @@ public class ViewcodeManager : MonoBehaviour
             // Dodaj listenery do pola LabelInputField
             labelInputField.onValueChanged.AddListener(newText =>
             {
-                instruction[2] = newText; // Zaktualizuj wartość instruction[2]
-                Debug.Log($"Label updated: {newText}");
+                instruction[2] = newText;
             });
 
             // Dodaj listenery do pola InstructionInputField
             instructionInputField.onValueChanged.AddListener(newText =>
             {
-                instruction[1] = newText; // Zaktualizuj wartość instruction[1]
-                Debug.Log($"Instruction updated: {newText}");
+                instruction[1] = newText;
             });
 
             // Dodaj kontener opcji (OptionContainer) w RowContainer
@@ -188,6 +189,7 @@ public class ViewcodeManager : MonoBehaviour
         // Usuń instrukcję z listy
         if (instructionList.Contains(instruction)){
             instructionList.Remove(instruction);
+            InstructionManager.RemoveInstruction(instruction);
         }
         else{
             Debug.LogWarning($"Instrukcja '{instruction}' nie istnieje na li�cie.");
@@ -202,6 +204,8 @@ public class ViewcodeManager : MonoBehaviour
     public void RemoveAllInstructions(string instruction)
     {
         instructionList.RemoveAll(i => i[0] == instruction);
+        InstructionManager.RemoveInstructionList(instruction);
+        dropdown.value = 0; // prevents dropdown value to be out of range
         createListOfInstructions();
     }
 
@@ -209,6 +213,7 @@ public class ViewcodeManager : MonoBehaviour
     {
         string[] newInstruction = new string[] { instruction, "", "" };
         instructionList.Add(newInstruction);
+        InstructionManager.AddInstruction(newInstruction);
         createListOfInstructions();
     }
 
@@ -224,6 +229,8 @@ public class ViewcodeManager : MonoBehaviour
         instructionList[index] = instructionList[index - 1];
         instructionList[index - 1] = temp;
 
+        InstructionManager.Swap(index - 1, index);
+
         createListOfInstructions();
     }
 
@@ -238,6 +245,8 @@ public class ViewcodeManager : MonoBehaviour
 
         instructionList[index] = instructionList[index + 1];
         instructionList[index + 1] = temp;
+
+        InstructionManager.Swap(index, index + 1);
 
         createListOfInstructions();
     }
