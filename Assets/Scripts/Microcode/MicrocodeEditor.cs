@@ -190,11 +190,12 @@ public class MicrocodeEditor : MonoBehaviour
     public void SaveChanges()
     {
         MicrocodeTable.Clear();
+        int address = 0;
         foreach (var row in tempMicrocodeTable.GetAllRows())
         {
             var currentRow = new MicrocodeRow
             {
-                Address = row.Address,
+                Address = address,
                 Label = row.Label,
                 ALU = row.ALU,
                 S1 = row.S1,
@@ -210,8 +211,9 @@ public class MicrocodeEditor : MonoBehaviour
                 Regs = row.Regs
             };
             MicrocodeTable.AddRow(currentRow);
+            address++;
         }
-
+        PrintTable();
         Debug.Log("Zmiany zosta³y zapisane.");
     }
 
@@ -241,8 +243,6 @@ public class MicrocodeEditor : MonoBehaviour
         var group = mnemonicToggleGroup.GetComponentsInChildren<UnityEngine.UI.Toggle>();
         foreach (var toggle in group)
         {
-            Debug.Log("Wchodze tutaj lalala");
-            Debug.Log(toggle.name);
             if (toggle.name == value)
             {
                 toggle.isOn = true; // Ustaw jako aktywny

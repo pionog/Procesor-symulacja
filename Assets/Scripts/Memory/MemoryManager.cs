@@ -4,10 +4,21 @@ public class MemoryManager : MonoBehaviour
 {
     public int memorySize = 1024;
     private byte[] memory;
+    public static MemoryManager Instance;
 
-    void Awake()
+    private void Awake()
     {
-        InitializeMemory();
+        // Singleton pattern to ensure only one instance of GameManager exists
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
+            InitializeMemory();
+        }
     }
 
     public void InitializeMemory()
@@ -51,10 +62,10 @@ public class MemoryManager : MonoBehaviour
             return;
         }
 
-        memory[address] = (byte)(value & 0xFF);           // Bajt 0
+        memory[address] = (byte)(value & 0xFF);           // Bajt 0 (LSB)
         memory[address + 1] = (byte)((value >> 8) & 0xFF); // Bajt 1
         memory[address + 2] = (byte)((value >> 16) & 0xFF); // Bajt 2
-        memory[address + 3] = (byte)((value >> 24) & 0xFF); // Bajt 3
+        memory[address + 3] = (byte)((value >> 24) & 0xFF); // Bajt 3 (MSB)
     }
 
     public int ReadInt(int address)
@@ -65,10 +76,10 @@ public class MemoryManager : MonoBehaviour
             return 0;
         }
 
-        // Sk³adanie 4 bajtów w jeden int (big-endian)
-        return (memory[address] << 24) |
-               (memory[address + 1] << 16) |
-               (memory[address + 2] << 8) |
-                memory[address + 3];
+        // Sk³adanie 4 bajtów w jeden int (little-endian)
+        return memory[address] |
+               (memory[address + 1] << 8) |
+               (memory[address + 2] << 16) |
+               (memory[address + 3] << 24);
     }
 }

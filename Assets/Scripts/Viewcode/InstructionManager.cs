@@ -5,13 +5,24 @@ using UnityEngine;
 
 public class InstructionManager : MonoBehaviour
 {
+    public static InstructionManager Instance { get; set; }
     private List<string[]> instructionList = new List<string[]>();
     private const int stringsInArray = 3 - 1;
     // Start is called before the first frame update
+
     private void Awake()
     {
-        // Inicjalizacja s³ownika
-        instructionList = new List<string[]>();
+        // Singleton pattern to ensure only one instance of GameManager exists
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            instructionList = new List<string[]>();
+            DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
+        }
     }
     public void UpdateInstructionList(List<string[]> instructionList) {
         this.instructionList.Clear();
@@ -25,6 +36,9 @@ public class InstructionManager : MonoBehaviour
     }
     public void RemoveInstructionList(string instruction) { 
         instructionList.RemoveAll(i => i[0] == instruction);
+    }
+    public string[] GetInstruction(int index) { 
+        return instructionList[index];
     }
 
     public void Swap(int first, int second) { 

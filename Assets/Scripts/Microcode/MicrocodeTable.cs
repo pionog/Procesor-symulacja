@@ -39,6 +39,9 @@ public class MicrocodeTable
     {
         return rows;
     }
+    public int Count() { 
+        return rows.Count;
+    }
 
     public void Clear()
     {

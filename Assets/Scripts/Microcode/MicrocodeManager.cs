@@ -6,11 +6,21 @@ public class MicrocodeManager : MonoBehaviour
 {
     // S³ownik przechowuj¹cy tabele mikrokodów dla ró¿nych mnemoników
     private Dictionary<string, MicrocodeTable> microcodeTables;
+    public static MicrocodeManager Instance;
 
     private void Awake()
     {
-        // Inicjalizacja s³ownika
-        microcodeTables = new Dictionary<string, MicrocodeTable>();
+        // Singleton pattern to ensure only one instance of GameManager exists
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            microcodeTables = new Dictionary<string, MicrocodeTable>();
+            DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
+        }
     }
 
     // Dodawanie istniej¹cej tabeli mikrokodów do s³ownika
@@ -38,6 +48,17 @@ public class MicrocodeManager : MonoBehaviour
         {
             Debug.LogError($"Tabela mikrokodów dla mnemonika '{mnemonic}' nie istnieje.");
             return null;
+        }
+    }
+    public int GetMicrocodeTableLength(string mnemonic) {
+        if (microcodeTables.TryGetValue(mnemonic, out var table))
+        {
+            return table.Count();
+        }
+        else
+        {
+            Debug.LogError($"Tabela mikrokodów dla mnemonika '{mnemonic}' nie istnieje.");
+            return 0;
         }
     }
 
