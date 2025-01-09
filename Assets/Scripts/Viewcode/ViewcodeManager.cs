@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class ViewcodeManager : MonoBehaviour
 {
-    private List<string> instructionList = new List<string>();
+    private List<string[]> instructionList = new List<string[]>();
 
     public Transform content; // Referencja do Content w ScrollRect
     public GameObject mnemonicButtonPrefab; // Prefab przycisku mnemonika
@@ -64,10 +64,24 @@ public class ViewcodeManager : MonoBehaviour
             }
 
             // Ustaw wartości w polach i przycisku
-            labelInputField.text = ""; // Możesz zmienić tekst na coś sensownego
-            instructionInputField.text = ""; // Instrukcja dla pola input
+            labelInputField.text = $"{instruction[2]}"; // Możesz zmienić tekst na coś sensownego
+            instructionInputField.text = $"{instruction[1]}"; // Instrukcja dla pola input
 
-            mnemonicButton.GetComponentInChildren<TMP_Text>().text = $"{instruction}"; // Ustaw tekst przycisku
+            mnemonicButton.GetComponentInChildren<TMP_Text>().text = $"{instruction[0]}"; // Ustaw tekst przycisku
+
+            // Dodaj listenery do pola LabelInputField
+            labelInputField.onValueChanged.AddListener(newText =>
+            {
+                instruction[2] = newText; // Zaktualizuj wartość instruction[2]
+                Debug.Log($"Label updated: {newText}");
+            });
+
+            // Dodaj listenery do pola InstructionInputField
+            instructionInputField.onValueChanged.AddListener(newText =>
+            {
+                instruction[1] = newText; // Zaktualizuj wartość instruction[1]
+                Debug.Log($"Instruction updated: {newText}");
+            });
 
             // Dodaj kontener opcji (OptionContainer) w RowContainer
             GameObject optionContainer = new GameObject("OptionContainer");
@@ -92,7 +106,7 @@ public class ViewcodeManager : MonoBehaviour
         }
     }
 
-    private void ToggleOptions(string instruction, GameObject optionContainer, int index)
+    private void ToggleOptions(string[] instruction, GameObject optionContainer, int index)
     {
         // Je�li kontener opcji jest aktywny, ukryj go
         if (optionContainer.activeSelf){
@@ -167,14 +181,7 @@ public class ViewcodeManager : MonoBehaviour
         optionContainer.SetActive(true);
     }
 
-    public void EditInstructionArguments(string instruction)
-    {
-        Debug.Log($"Edycja instrukcji: {instruction}");
-        //Logika edycji
-        //To już chyba pozostawiam Tobie, edycje argumentów, tak jak mówiłeś? 
-    }
-
-    public void RemoveInstruction(string instruction, GameObject optionContainer)
+    public void RemoveInstruction(string[] instruction, GameObject optionContainer)
     {
         Debug.Log($"Usuwanie instrukcji: {instruction}");
 
@@ -192,13 +199,16 @@ public class ViewcodeManager : MonoBehaviour
         createListOfInstructions();
     }
 
-    public void RemoveAllInstructions(string instruction){
-        instructionList.RemoveAll(i => i == instruction);
+    public void RemoveAllInstructions(string instruction)
+    {
+        instructionList.RemoveAll(i => i[0] == instruction);
         createListOfInstructions();
     }
 
-    public void AddNewInstruction(string instruction){
-        instructionList.Add(instruction);
+    public void AddNewInstruction(string instruction)
+    {
+        string[] newInstruction = new string[] { instruction, "", "" };
+        instructionList.Add(newInstruction);
         createListOfInstructions();
     }
 
@@ -209,7 +219,7 @@ public class ViewcodeManager : MonoBehaviour
             return;
         }
 
-        string temp = instructionList[index];
+        string[] temp = instructionList[index];
 
         instructionList[index] = instructionList[index - 1];
         instructionList[index - 1] = temp;
@@ -224,7 +234,7 @@ public class ViewcodeManager : MonoBehaviour
             return;
         }
 
-        string temp = instructionList[index];
+        string[] temp = instructionList[index];
 
         instructionList[index] = instructionList[index + 1];
         instructionList[index + 1] = temp;
