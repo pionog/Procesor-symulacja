@@ -49,7 +49,7 @@ public class MicrocodeExecutor : MonoBehaviour
         this.MemoryManager = MemoryManager;
     }
 
-    public bool Execute(int currentAddress, string[] regs)
+    public bool Execute(int currentAddress, string[] args, int[] argsType)
     {
         var row = MicrocodeTable.GetRow(currentAddress);
         if (row == null)
@@ -136,32 +136,32 @@ public class MicrocodeExecutor : MonoBehaviour
             switch (row.Regs)
             {
                 case "RR":
-                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(regs[0]));
-                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(regs[1]));
+                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(args[0]));
+                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(args[1]));
                     break;
                 case "RAF3":
-                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(regs[2]));
+                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(args[2]));
                     break;
                 case "RAF4":
-                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(regs[3]));
+                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(args[3]));
                     break;
                 case "RBF3":
-                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(regs[2]));
+                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(args[2]));
                     break;
                 case "RBF4":
-                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(regs[3]));
+                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(args[3]));
                     break;
                 case "WF1":
-                    RegisterManager.SetRegisterValue(regs[0], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.SetRegisterValue(args[0], RegisterManager.GetRegisterValue(lastDest));
                     break;
                 case "WF2":
-                    RegisterManager.SetRegisterValue(regs[1], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.SetRegisterValue(args[1], RegisterManager.GetRegisterValue(lastDest));
                     break;
                 case "WF3":
-                    RegisterManager.SetRegisterValue(regs[2], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.SetRegisterValue(args[2], RegisterManager.GetRegisterValue(lastDest));
                     break;
                 case "WF4":
-                    RegisterManager.SetRegisterValue(regs[3], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.SetRegisterValue(args[3], RegisterManager.GetRegisterValue(lastDest));
                     break;
                 default:
                     break;

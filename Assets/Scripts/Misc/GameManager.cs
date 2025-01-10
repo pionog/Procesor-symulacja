@@ -223,12 +223,18 @@ public class GameManager : MonoBehaviour
             Debug.Log("Wykonuje krok: " + currentMicrocodeRow.ToString());
             instructionArray = InstructionManager.GetInstruction(currentInstruction);
             mnemonic = instructionArray[0];
+            string[] args = TextParser.SplitText(instructionArray[1]);
+            Debug.Log("Wypisuje elementy zapisane w args:");
+            foreach(var ar in args) {
+                Debug.Log(ar.ToString());
+            }
+            int[] argsType = TextParser.AnalyzeWords(args);
             MicrocodeTable currentTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
             lastStepIndex = currentTable.Count();
             while (currentMicrocodeRow < lastStepIndex)
             {
                 MicrocodeExecutor.SetMicrocodeTable(currentTable);
-                MicrocodeExecutor.Execute(currentMicrocodeRow, new string[] { "R1", "R2" });
+                MicrocodeExecutor.Execute(currentMicrocodeRow, args, argsType);
                 currentMicrocodeRow++;
                 CurrentMicrocodeRow++;
                 currentStep++;
