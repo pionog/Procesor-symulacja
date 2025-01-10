@@ -79,7 +79,6 @@ public class MicrocodeExecutor : MonoBehaviour
                 "S2" => s2,
                 _ => throw new Exception($"Unknown ALU operation: {row.ALU}")
             };
-            Debug.Log("Rejestr dest: " + row.Dest);
             if (!string.IsNullOrEmpty(row.Dest))
             {
                 //Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.GetRegisterValue(row.Dest).ToString());

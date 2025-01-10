@@ -73,16 +73,23 @@ public class ViewcodeManager : MonoBehaviour
             mnemonicButton.GetComponentInChildren<TMP_Text>().text = $"{instruction[0]}"; // Ustaw tekst przycisku
 
             // Dodaj listenery do pola LabelInputField
-            labelInputField.onValueChanged.AddListener(newText =>
+            labelInputField.onEndEdit.AddListener(newText =>
             {
                 instruction[2] = newText;
             });
 
             // Dodaj listenery do pola InstructionInputField
-            instructionInputField.onValueChanged.AddListener(newText =>
+            instructionInputField.onEndEdit.AddListener(newText =>
             {
+                List<string> list = new List<string>();
+                foreach (string[] s in instructionList) {
+                    list.Add(s[2]);
+                }
+                newText = TextParser.indicateErrors(newText, list);
                 instruction[1] = newText;
+                instructionInputField.text = newText;
             });
+
 
             // Dodaj kontener opcji (OptionContainer) w RowContainer
             GameObject optionContainer = new GameObject("OptionContainer");

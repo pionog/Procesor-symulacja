@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 public class TextParser
@@ -27,7 +29,8 @@ public class TextParser
         // Wyra¿enia regularne do rozpoznawania typów
         Regex registerRegex = new Regex(@"^R[0-9]{1,2}$"); // Dopasowuje rejestry R0-R32
         Regex constantRegex = new Regex(@"^0X[0-9A-Fa-f]+$"); // Dopasowuje liczby szesnastkowe (np. 0x03C)
-        Regex offsetRegex = new Regex(@"^0X[0-9A-Fa-f]+\s*\(R[0-9]{1,2}\)$"); // Dopasowuje liczby z przesuniêciem (np. 0x0300(R1))
+        Regex constantDecimalRegex = new Regex(@"^\d+$"); // Dopasowuje liczby dziesiatkowe
+        Regex offsetRegex = new Regex(@" ^ 0X[0-9A-Fa-f]+\s*\(R[0-9]{1,2}\)$"); // Dopasowuje liczby z przesuniêciem (np. 0x0300(R1))
         Regex labelRegex = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]*$"); // Dopasowuje etykiety (np. secondLoop)
 
         foreach (var word in words)
@@ -39,7 +42,7 @@ public class TextParser
             {
                 types.Add(0); // Rejestr
             }
-            else if (constantRegex.IsMatch(trimmedWord))
+            else if (constantRegex.IsMatch(trimmedWord) || constantDecimalRegex.IsMatch(trimmedWord))
             {
                 types.Add(1); // Liczba sta³a
             }
@@ -54,11 +57,41 @@ public class TextParser
             else
             {
                 types.Add(4);
-                throw new Exception($"Nieznany typ: {trimmedWord}");
+                //throw new Exception($"Nieznany typ: {trimmedWord}");
             }
         }
 
         return types.ToArray();
+    }
+
+    public static string indicateErrors(string input, List<string> labels)
+    {
+        string[] analyzedWords = SplitText(input);
+        int[] types = AnalyzeWords(analyzedWords);
+        string result = "";
+        for (int i = 0; i < types.Length; i++)
+        {
+            result += analyzedWords[i];
+            if (!analyzedWords[i].Contains("<b³¹d>")) {
+                Debug.Log("Prawdobodone zle slowo: " + analyzedWords[i]);
+                if (types[i] == 2)
+                {
+                    if (!labels.Contains(analyzedWords[i]))
+                    {
+                        result += "<b³¹d>";
+                    }
+                }
+                if (types[i] == 4)
+                {
+                    result += "<b³¹d>";
+                }
+            }
+            if (i != types.Length - 1)
+            {
+                result += ", ";
+            }
+        }
+        return result;
     }
 
     public static void TestParser()

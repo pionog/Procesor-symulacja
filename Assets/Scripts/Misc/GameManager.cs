@@ -220,14 +220,9 @@ public class GameManager : MonoBehaviour
         int lastStepIndex;
         while (currentStep < steps)
         {
-            Debug.Log("Wykonuje krok: " + currentMicrocodeRow.ToString());
             instructionArray = InstructionManager.GetInstruction(currentInstruction);
             mnemonic = instructionArray[0];
             string[] args = TextParser.SplitText(instructionArray[1]);
-            Debug.Log("Wypisuje elementy zapisane w args:");
-            foreach(var ar in args) {
-                Debug.Log(ar.ToString());
-            }
             int[] argsType = TextParser.AnalyzeWords(args);
             MicrocodeTable currentTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
             lastStepIndex = currentTable.Count();
