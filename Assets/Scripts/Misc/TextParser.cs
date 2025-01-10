@@ -73,16 +73,17 @@ public class TextParser
         {
             result += analyzedWords[i];
             if (!analyzedWords[i].Contains("<b³¹d>")) {
-                Debug.Log("Prawdobodone zle slowo: " + analyzedWords[i]);
                 if (types[i] == 2)
                 {
                     if (!labels.Contains(analyzedWords[i]))
                     {
+                        Debug.Log("Nie ma takiej etykiety!");
                         result += "<b³¹d>";
                     }
                 }
                 if (types[i] == 4)
                 {
+                    Debug.Log("Niedozwolony ci¹g znaków!");
                     result += "<b³¹d>";
                 }
             }
