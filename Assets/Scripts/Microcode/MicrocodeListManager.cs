@@ -22,12 +22,12 @@ public class MicrocodeListManager : MonoBehaviour
     void Start()
     {
         //// Przyk�adowe mnemoniki
-        //mnemonics.Add("LOAD");
-        //mnemonics.Add("STORE");
-        //mnemonics.Add("ADD");
-        //mnemonics.Add("SUB");
-        //mnemonics.Add("STEPW7C");
-
+        mnemonics.Add("START");
+        mnemonics.Add("ADD");
+        mnemonics.Add("SUB");
+        mnemonics.Add("LOAD");
+        mnemonics.Add("STORE");
+        mnemonics.Add("MOV");
         RefreshList();
     }
 
@@ -144,11 +144,14 @@ public class MicrocodeListManager : MonoBehaviour
         editButton.GetComponent<Button>().onClick.AddListener(() => EditMnemonic(mnemonic));
 
         GameObject deleteButton = Instantiate(optionButtonPrefab, optionContainer.transform);
+        if (!MicrocodeManager.GetMicrocodeTable(mnemonic).GetRemovable()) {
+            deleteButton.GetComponent<Button>().interactable = false;
+        }
 
         TMP_Text deleteButtonText = deleteButton.transform.GetComponentInChildren<TMP_Text>();
         if (deleteButtonText != null)
         {
-            deleteButtonText.text = "Usu�";
+            deleteButtonText.text = "Usuń";
         }
         else
         {

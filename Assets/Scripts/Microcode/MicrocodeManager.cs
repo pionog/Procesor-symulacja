@@ -19,6 +19,63 @@ public class MicrocodeManager : MonoBehaviour
         {
             Instance = this;
             microcodeTables = new Dictionary<string, MicrocodeTable>();
+
+            //start mnemonic
+            MicrocodeTable start = new MicrocodeTable();
+            MicrocodeRow startRow = new MicrocodeRow() { Address = 0, Mem = "Read", MAdr = "PC", MDest = "IR" };
+            start.AddRow(startRow);
+            startRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1="PC", S2="Const", Dest = "PC", Const = 4, Regs = "RR"};
+            start.AddRow(startRow);
+            start.SetRemovable(false);
+            start.SetEditable(false);
+            microcodeTables.Add("START", start);
+
+            //add mnemonic
+            MicrocodeTable add = new MicrocodeTable();
+            MicrocodeRow addRow = new MicrocodeRow() { Address = 0, ALU="ADD", S1="A", S2="B", Dest="C"};
+            add.AddRow(addRow);
+            addRow = new MicrocodeRow() { Address = 1, JCond="True", Regs="WF3" };
+            add.AddRow(addRow);
+            microcodeTables.Add("ADD", add);
+
+            //sub mnemonic
+            MicrocodeTable sub = new MicrocodeTable();
+            MicrocodeRow subRow = new MicrocodeRow() { Address = 0, ALU = "SUB", S1 = "A", S2 = "B", Dest = "C" };
+            sub.AddRow(subRow);
+            subRow = new MicrocodeRow() { Address = 1, JCond = "True", Regs = "WF3" };
+            sub.AddRow(subRow);
+            microcodeTables.Add("SUB", sub);
+
+            //load mnemonic
+            MicrocodeTable load = new MicrocodeTable();
+            MicrocodeRow loadRow = new MicrocodeRow() { Address = 0, ALU = "ADD", S1 = "A", S2 = "IR", Dest = "MAR" };
+            load.AddRow(loadRow);
+            loadRow = new MicrocodeRow() { Address = 1, Mem = "Read", MAdr = "MAR", MDest = "MDR" };
+            load.AddRow(loadRow);
+            loadRow = new MicrocodeRow() { Address = 2, ALU = "S1", S1 = "MDR", Dest = "C" };
+            load.AddRow(loadRow);
+            loadRow = new MicrocodeRow() { Address = 3, JCond = "True", Regs = "WF2" };
+            load.AddRow(loadRow);
+            microcodeTables.Add("LOAD", load);
+
+            //store mnemonic
+            MicrocodeTable store = new MicrocodeTable();
+            MicrocodeRow storeRow = new MicrocodeRow() { Address = 0, ALU = "S2", S2 = "B", Dest = "MDR" };
+            store.AddRow(storeRow);
+            storeRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1 = "A", S2 = "IR", Dest = "MAR" };
+            store.AddRow(storeRow);
+            storeRow = new MicrocodeRow() { Address = 2, JCond="True", Mem = "Write", MAdr = "MAR", MDest = "MDR" };           
+            store.AddRow(storeRow);
+            microcodeTables.Add("STORE", store);
+
+            //move mnemonic
+            MicrocodeTable move = new MicrocodeTable();
+            MicrocodeRow moveRow = new MicrocodeRow() { Address = 0, ALU = "ADD", S1="Const", S2 = "B", Dest = "C", Const = 0 };
+            move.AddRow(moveRow);
+            moveRow = new MicrocodeRow() { Address = 1, JCond = "True", Regs="WF1" };
+            move.AddRow(moveRow);
+            microcodeTables.Add("MOV", move);
+
             DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
         }
     }

@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     private int CurrentInstruction = 0;
     private int CurrentMicrocodeRow = 0;
+    private bool IRTransition = true;
 
 
     private void Awake()

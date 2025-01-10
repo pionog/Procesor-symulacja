@@ -8,6 +8,8 @@ public class MicrocodeTable
     private List<MicrocodeRow> rows = new List<MicrocodeRow>();
     private int MicrocodeType = 0; // 0 - R type,   1 - I Type, 2 - J Type
     private int RegistersNumber = 2;
+    private bool Removable = true;
+    private bool Editable = true;
 
     public void AddRow(MicrocodeRow row)
     {
@@ -33,6 +35,22 @@ public class MicrocodeTable
     public void SetRegistersNumber(int registersNumber)
     {
         RegistersNumber = registersNumber;
+    }
+    public bool GetRemovable()
+    {
+        return Removable;
+    }
+    public void SetRemovable(bool Removable)
+    {
+        this.Removable = Removable;
+    }
+    public bool GetEditable()
+    {
+        return Editable;
+    }
+    public void SetEditable(bool Editable)
+    {
+        this.Editable = Editable;
     }
 
     public IEnumerable<MicrocodeRow> GetAllRows()

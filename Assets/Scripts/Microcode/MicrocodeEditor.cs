@@ -13,6 +13,8 @@ public class MicrocodeEditor : MonoBehaviour
     public GameObject RowAliases;
     public MicrocodeTable MicrocodeTable;
     public GameObject AddNewRowButton;
+    public GameObject SaveButton;
+    public GameObject ChangeTypeButton;
     private MicrocodeTable tempMicrocodeTable; // Tymczasowa tabela
     public string Mnemonic { get; set; }
     public TMP_Text MnemonicTitle;
@@ -140,6 +142,17 @@ public class MicrocodeEditor : MonoBehaviour
                 Destroy(child.gameObject);
             }
         }
+        if (!MicrocodeTable.GetEditable())
+        {
+            ChangeTypeButton.GetComponent<UnityEngine.UI.Button>().interactable = false;
+            SaveButton.GetComponent<UnityEngine.UI.Button>().interactable = false;
+            AddNewRowButton.GetComponent<UnityEngine.UI.Button>().interactable = false;
+        }
+        else {
+            ChangeTypeButton.GetComponent<UnityEngine.UI.Button>().interactable = true;
+            SaveButton.GetComponent<UnityEngine.UI.Button>().interactable = true;
+            AddNewRowButton.GetComponent<UnityEngine.UI.Button>().interactable = true;
+        }
 
         var rowAliases = Instantiate(RowAliases, TableParent);
         RectTransform rowAliasesRectTransform = rowAliases.GetComponent<RectTransform>();
@@ -179,6 +192,7 @@ public class MicrocodeEditor : MonoBehaviour
         }
 
         AddNewRowButton.transform.SetAsLastSibling();
+        
 
         mnemonicRegistersNumber.text = MicrocodeTable.GetRegistersNumber().ToString();
         int toggleNumber = MicrocodeTable.GetMicrocodeType();
