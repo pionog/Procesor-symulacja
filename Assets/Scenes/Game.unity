@@ -3158,7 +3158,7 @@ MonoBehaviour:
     Removable: 1
     Editable: 1
   AddNewRowButton: {fileID: 1943238723}
-  SaveButton: {fileID: 1766791639}
+  SaveButton: {fileID: 1145306402}
   ChangeTypeButton: {fileID: 1180755841}
   MnemonicTitle: {fileID: 261143927}
   mnemonicToggleGroup: {fileID: 1525955991}
@@ -18197,7 +18197,6 @@ MonoBehaviour:
   RewindButton: {fileID: 263185511}
   MultipleCyclesToggle: {fileID: 1055921072}
   Cycles: {fileID: 393586687}
-  MicrocodeManager: {fileID: 1712195981}
 --- !u!1 &1712195980
 GameObject:
   m_ObjectHideFlags: 0
@@ -18877,11 +18876,6 @@ PrefabInstance:
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8384263338732708588, guid: b0530821e79a8a7408793df4514af479, type: 3}
   m_PrefabInstance: {fileID: 1762180002}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1766791639 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3889857456824307484, guid: ede2d2ea6a6647f4c81fd6635dc4d20f, type: 3}
-  m_PrefabInstance: {fileID: 2055730495}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1770099821
 PrefabInstance:
@@ -20662,7 +20656,7 @@ PrefabInstance:
     - target: {fileID: 3666233810177156611, guid: 82ed40c8e1bee8f4392c4a0fa407ea9e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1947679820}
+      objectReference: {fileID: 1914573621}
     - target: {fileID: 3666233810177156611, guid: 82ed40c8e1bee8f4392c4a0fa407ea9e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
@@ -22845,11 +22839,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ede2d2ea6a6647f4c81fd6635dc4d20f, type: 3}
---- !u!1 &2062577990 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3889857456824307484, guid: ede2d2ea6a6647f4c81fd6635dc4d20f, type: 3}
-  m_PrefabInstance: {fileID: 28310080}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2072238830
 GameObject:
   m_ObjectHideFlags: 0
