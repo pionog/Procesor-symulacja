@@ -11,6 +11,8 @@ public class MicrocodeExecutor : MonoBehaviour
     private MicrocodeTable MicrocodeTable;
     private MemoryManager MemoryManager;
     private string lastDest;
+    private bool StartMnemonic = true;
+    private bool JumpToLabel = false;
 
     private void Awake()
     {
@@ -48,6 +50,20 @@ public class MicrocodeExecutor : MonoBehaviour
     {
         this.MemoryManager = MemoryManager;
     }
+    public bool GetJumpBool() {
+        return JumpToLabel;
+    }
+    public void SetStartBool(bool start) {
+        this.StartMnemonic = start;
+    }
+    public bool GetStartBool()
+    {
+        return StartMnemonic;
+    }
+    public void SetJumpBool(bool jump)
+    {
+        this.JumpToLabel = jump;
+    }
 
     public bool Execute(int currentAddress, string[] args, int[] argsType)
     {
@@ -61,8 +77,8 @@ public class MicrocodeExecutor : MonoBehaviour
         // Obs³uga ALU
         if (!string.IsNullOrEmpty(row.ALU))
         {
-            int s1 = !string.IsNullOrEmpty(row.S1) ? (row.S1 == "Const" ? (int)row.Const : RegisterManager.GetRegisterValue(row.S1)) : 0;
-            int s2 = !string.IsNullOrEmpty(row.S2) ? (row.S2 == "Const" ? (int)row.Const : RegisterManager.GetRegisterValue(row.S2)) : 0;
+            int s1 = !string.IsNullOrEmpty(row.S1) ? (row.S1 == "Const" ? (int)row.Const : row.S1 == "IR" ? 0 : RegisterManager.GetRegisterValue(row.S1)) : 0;
+            int s2 = !string.IsNullOrEmpty(row.S2) ? (row.S2 == "Const" ? (int)row.Const : row.S2 == "IR" ? 0 : RegisterManager.GetRegisterValue(row.S2)) : 0;
 
             int result = row.ALU switch
             {
@@ -79,6 +95,7 @@ public class MicrocodeExecutor : MonoBehaviour
                 "S2" => s2,
                 _ => throw new Exception($"Unknown ALU operation: {row.ALU}")
             };
+
             if (!string.IsNullOrEmpty(row.Dest))
             {
                 //Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.GetRegisterValue(row.Dest).ToString());
@@ -91,21 +108,31 @@ public class MicrocodeExecutor : MonoBehaviour
         // Obs³uga skoków
         if (!string.IsNullOrEmpty(row.JCond) && !string.IsNullOrEmpty(row.Adr))
         {
+            int value = row.ALU switch {
+                "S1" => RegisterManager.GetRegisterValue(row.S1),
+                "S2" => RegisterManager.GetRegisterValue(row.S2),
+                _ => 0
+            };
+
+
             bool conditionMet = row.JCond switch
             {
                 "True" => true,
-                "GT" => RegisterManager.GetRegisterValue(row.S1) > 0,
-                "LT" => RegisterManager.GetRegisterValue(row.S1) < 0,
-                "GE" => RegisterManager.GetRegisterValue(row.S1) >= 0,
-                "LE" => RegisterManager.GetRegisterValue(row.S1) <= 0,
-                "EQ" => RegisterManager.GetRegisterValue(row.S1) == 0,
+                "GT" => value > 0,
+                "LT" => value < 0,
+                "GE" => value >= 0,
+                "LE" => value <= 0,
+                "EQ" => value == 0,
                 _ => false
             };
 
             if (conditionMet)
             {
-                Debug.Log("Nastapilby skok w tym miejscu");
+                StartMnemonic = true;
                 //currentAddress = int.Parse(row.Adr, System.Globalization.NumberStyles.HexNumber);
+            }
+            else {
+                JumpToLabel = false;
             }
         }
         // Obs³uga Mem

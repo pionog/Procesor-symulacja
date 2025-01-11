@@ -89,9 +89,10 @@ public class ViewcodeManager : MonoBehaviour
                 foreach (string[] s in instructionList) {
                     list.Add(s[2]);
                 }
-                newText = TextParser.indicateErrors(newText, list);
+                newText = TextParser.IndicateErrors(newText, list);
                 instruction[1] = newText;
                 instructionInputField.text = newText;
+                InstructionManager.UpdateIR();
             });
 
 

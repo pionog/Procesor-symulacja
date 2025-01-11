@@ -40,11 +40,13 @@ public class RegisterManager : MonoBehaviour
             { "PC", new Register("PC", 0) },
             { "MAR", new Register("MAR", 0) },
             { "MDR", new Register("MDR", 0) },
-            { "uAR", new Register("uAR", 0) }
+            { "uAR", new Register("uAR", 0) },
+            { "IR", new Register("IR", 0) }
         };
 
         // Inicjalizacja grupy R0-R32
         GeneralPurposeRegisters = new RegisterGroup("R", 32);
+
     }
 
     /// <summary>
