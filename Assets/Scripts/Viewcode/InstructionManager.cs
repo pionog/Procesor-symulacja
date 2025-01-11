@@ -13,6 +13,14 @@ public class InstructionManager : MonoBehaviour
     private const int stringsInArray = 3 - 1;
     // Start is called before the first frame update
 
+    public List<string[]> getInstructionList() {
+        return instructionList;
+    }
+
+    public void setInstructions(List<string[]> instructions) {
+        instructionList = instructions;
+    }
+
     private void Awake()
     {
         // Singleton pattern to ensure only one instance of GameManager exists
@@ -41,12 +49,14 @@ public class InstructionManager : MonoBehaviour
         registersList.Add(new int[] { originIndex * 4, IR });
         Debug.Log((originIndex * 4).ToString() + ", " +IR.ToString());
     }
+
     public void RemoveInstruction(string[] instruction) { 
         int index = instructionList.IndexOf(instruction);
         instructionList.Remove(instruction);
         registersList.RemoveAt(index);
         UpdateIR();
     }
+
     public void RemoveInstructionList(string instruction) { 
         instructionList.RemoveAll(i => i[0] == instruction);
         var instructions = instructionList
@@ -54,22 +64,19 @@ public class InstructionManager : MonoBehaviour
             .Select(array => array[0])
             .ToList();
         int[] indexes = instructions
-            .Select((value, index) => new { value, index }) // Sparowanie wartoœci z indeksami
-            .Where(pair => pair.value == instruction)       // Filtrujemy elementy, które pasuj¹ do instruction
+            .Select((value, index) => new { value, index }) // Sparowanie wartoï¿½ci z indeksami
+            .Where(pair => pair.value == instruction)       // Filtrujemy elementy, ktï¿½re pasujï¿½ do instruction
             .Select(pair => pair.index)                    // Wybieramy indeksy
             .ToArray();
-        foreach (var index in indexes.OrderByDescending(i => i)) // Sortowanie malej¹co
+        foreach (var index in indexes.OrderByDescending(i => i)) // Sortowanie malejï¿½co
         {
             if (index >= 0 && index < registersList.Count) // Sprawdzanie, czy indeks jest w zakresie
             {
-                registersList.RemoveAt(index); // Usuniêcie elementu na danym indeksie
+                registersList.RemoveAt(index); // Usuniï¿½cie elementu na danym indeksie
             }
         }
         UpdateIR();
     }
-
-    
-
     public string[] GetInstruction(int index) { 
         return instructionList[index];
     }
