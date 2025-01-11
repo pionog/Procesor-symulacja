@@ -2791,6 +2791,8 @@ MonoBehaviour:
   RowPrefab: {fileID: 3404153761550986300, guid: 7395a2ab5f406954a94c4992e0156e5f, type: 3}
   RowAliases: {fileID: 8700770354955009097, guid: 3f9c4c879aaa6d54eb911c63fb44ee14, type: 3}
   AddNewRowButton: {fileID: 1943238723}
+  SaveButton: {fileID: 1145306402}
+  ChangeTypeButton: {fileID: 2062577990}
   MnemonicTitle: {fileID: 261143927}
   mnemonicToggleGroup: {fileID: 1525955991}
   mnemonicRegistersNumber: {fileID: 562304793}
@@ -12475,6 +12477,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 628987509921432859, guid: ede2d2ea6a6647f4c81fd6635dc4d20f, type: 3}
   m_PrefabInstance: {fileID: 1614137396}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1145306402 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3889857456824307484, guid: ede2d2ea6a6647f4c81fd6635dc4d20f, type: 3}
+  m_PrefabInstance: {fileID: 2055730495}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1146118673
 GameObject:
   m_ObjectHideFlags: 0
@@ -17583,6 +17590,7 @@ MonoBehaviour:
   inputFieldPC: {fileID: 820124456}
   inputFieldMAR: {fileID: 356616167}
   inputFieldMDR: {fileID: 293975264}
+  inputFieldIR: {fileID: 0}
   Score: {fileID: 1575467976}
   ClockButton: {fileID: 1921109123}
   RewindButton: {fileID: 263185511}
@@ -21712,6 +21720,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ede2d2ea6a6647f4c81fd6635dc4d20f, type: 3}
+--- !u!1 &2062577990 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3889857456824307484, guid: ede2d2ea6a6647f4c81fd6635dc4d20f, type: 3}
+  m_PrefabInstance: {fileID: 28310080}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2072238830
 GameObject:
   m_ObjectHideFlags: 0
