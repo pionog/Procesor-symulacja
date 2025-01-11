@@ -88,6 +88,7 @@ public class ViewcodeManager : MonoBehaviour
                 newText = TextParser.IndicateErrors(newText, list);
                 instruction[1] = newText;
                 instructionInputField.text = newText;
+                InstructionManager.UpdateIR();
             });
 
 

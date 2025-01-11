@@ -39,6 +39,7 @@ public class InstructionManager : MonoBehaviour
             IR = CalculateIR(strings[labelIndex], originIndex);
         }
         registersList.Add(new int[] { originIndex * 4, IR });
+        Debug.Log((originIndex * 4).ToString() + ", " +IR.ToString());
     }
     public void RemoveInstruction(string[] instruction) { 
         int index = instructionList.IndexOf(instruction);
@@ -87,8 +88,12 @@ public class InstructionManager : MonoBehaviour
             throw new Exception($"{second} jest spoza mozliwego zakresu (0-{len})!");
         }
         string[] temp = instructionList[second];
+        int[] tempInt = registersList[second];
         instructionList[second] = instructionList[first];
         instructionList[first] = temp;
+        registersList[second] = registersList[first];
+        registersList[first] = tempInt;
+        UpdateIR();
         Debug.Log("Pomyslnie zamieniono pozycje na liscie instrukcji.");
     }
 
@@ -104,6 +109,7 @@ public class InstructionManager : MonoBehaviour
                 int IR = CalculateIR(strings[labelIndex], i); // obliczanie nowego IR
                 registersList[i][1] = IR; // akutalizowanie wartosci IR
             }
+            Debug.Log("IR dla indeksu " + i.ToString() + ":\t" + registersList[i][1].ToString());
         }
     }
 
@@ -112,15 +118,18 @@ public class InstructionManager : MonoBehaviour
             .Where(array => array.Length > 2)
             .Select(array => array[2])
             .ToList();
+
         int destinationIndex = LabelsList.IndexOf(label);
-        if (destinationIndex != -1)
+        if (destinationIndex == -1)
         {
+            Debug.Log("Nie znaleziono takiej etykiety!");
             return 0;
         }
         else {
             originIndex *= 4;
             destinationIndex *= 4;
-            return destinationIndex - (originIndex + 4);
+            int result = destinationIndex - (originIndex + 4);
+            return result;
         }
     }
 
