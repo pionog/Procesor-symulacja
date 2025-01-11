@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public TMP_InputField inputFieldPC;
     public TMP_InputField inputFieldMAR;
     public TMP_InputField inputFieldMDR;
+    public TMP_InputField inputFieldIR;
     private Dictionary<string, TMP_Text> registerTexts = new Dictionary<string, TMP_Text>();
 
     public TMP_Text Score;
@@ -36,8 +37,6 @@ public class GameManager : MonoBehaviour
 
     private int CurrentInstruction = 0;
     private int CurrentMicrocodeRow = 0;
-    private bool IRTransition = true;
-
 
     private void Awake()
     {
@@ -111,6 +110,7 @@ public class GameManager : MonoBehaviour
         }
         RegisterManager.SetRegisterValue("MAR", 16);
         RegisterManager.SetRegisterValue("MDR", 305419896);
+
         UpdateInputFields();
     }
 
@@ -178,6 +178,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning($"Rejestr o nazwie {registerName} ju¿ istnieje w widoku.");
         }
     }
+
 
     private void UpdateInputFields()
     {

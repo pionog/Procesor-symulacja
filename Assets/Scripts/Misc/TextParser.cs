@@ -8,6 +8,15 @@ using UnityEngine;
 
 public class TextParser
 {
+    /// <summary>
+    /// Rozdziela kolejne s³owa po przecinkach do tablicy String
+    /// </summary>
+    /// <param name="input">
+    /// Zdanie zawieraj¹ce s³owa rozdzielone przecinkami.
+    /// </param>
+    /// <returns>
+    /// Tablicê wyrazów
+    /// </returns>
     public static string[] SplitText(string input)
     {
         // Rozdziel tekst na podstawie przecinków
@@ -22,6 +31,32 @@ public class TextParser
         return parts;
     }
 
+    /// <summary>
+    /// Analizuje typ danych s³ów
+    /// </summary>
+    /// <param name="words">
+    /// Tablica s³ów
+    /// </param>
+    /// <returns>
+    /// Tablicê liczb <c>int</c>
+    /// <list type="bullet">
+    /// <item>
+    /// <description>0 - Rejestr</description>
+    /// </item>
+    /// <item>
+    /// <description>1 - Liczba sta³a</description>
+    /// </item>
+    /// <item>
+    /// <description>2 - Etykieta</description>
+    /// </item>
+    /// <item>
+    /// <description>3 - Liczba sta³a z przesuniêciem</description>
+    /// </item>
+    /// <item>
+    /// <description>4 - Nieznany typ</description>
+    /// </item>
+    /// </list>
+    /// </returns>
     public static int[] AnalyzeWords(string[] words)
     {
         List<int> types = new List<int>();
@@ -64,7 +99,19 @@ public class TextParser
         return types.ToArray();
     }
 
-    public static string indicateErrors(string input, List<string> labels)
+    /// <summary>
+    /// Wykrywa b³êdy w zapisanej instrukcji i oznacza b³êdne pozycje
+    /// </summary>
+    /// <param name="input">
+    /// Instrukcja do przeanalizowania
+    /// </param>
+    /// <param name="labels">
+    /// Lista wszystkich etykiet dostêpnych w liœcie instrukcji
+    /// </param>
+    /// <returns>
+    /// Instrukcjê z naniesionymi oznaczeniami b³êdu, jeœli zosta³y wykryte
+    /// </returns>
+    public static string IndicateErrors(string input, List<string> labels)
     {
         string[] analyzedWords = SplitText(input);
         int[] types = AnalyzeWords(analyzedWords);
