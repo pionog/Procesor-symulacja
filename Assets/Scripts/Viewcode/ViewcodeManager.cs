@@ -16,6 +16,10 @@ public class ViewcodeManager : MonoBehaviour
     public GameObject ViewcodeGlobalManager;
     public TMP_Dropdown dropdown;
 
+    public List<string[]> getInstructionList() {
+        return instructionList;
+    }
+
     void OnEnable() {
         List<string> instructionsToDelete = ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().getInstructionsToDelete();
 

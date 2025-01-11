@@ -21,6 +21,7 @@ public class MicrocodeListManager : MonoBehaviour
 
     void Start()
     {
+        MicrocodeManager = MicrocodeManager.Instance;
         //// Przyk�adowe mnemoniki
         mnemonics.Add("START");
         mnemonics.Add("ADD");

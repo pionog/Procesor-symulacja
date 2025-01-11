@@ -10,6 +10,14 @@ public class InstructionManager : MonoBehaviour
     private const int stringsInArray = 3 - 1;
     // Start is called before the first frame update
 
+    public List<string[]> getInstructionList() {
+        return instructionList;
+    }
+
+    public void setInstructions(List<string[]> instructions) {
+        instructionList = instructions;
+    }
+
     private void Awake()
     {
         // Singleton pattern to ensure only one instance of GameManager exists
@@ -24,19 +32,24 @@ public class InstructionManager : MonoBehaviour
             DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
         }
     }
+
     public void UpdateInstructionList(List<string[]> instructionList) {
         this.instructionList.Clear();
         this.instructionList = instructionList;
     }
+
     public void AddInstruction(string[] instruction) { 
         instructionList.Add(instruction);
     }
+
     public void RemoveInstruction(string[] instruction) { 
         instructionList.Remove(instruction);
     }
+
     public void RemoveInstructionList(string instruction) { 
         instructionList.RemoveAll(i => i[0] == instruction);
     }
+
     public string[] GetInstruction(int index) { 
         return instructionList[index];
     }
