@@ -48,7 +48,6 @@ public class GameManager : MonoBehaviour
     private InstructionManager InstructionManager;
     private MicrocodeExecutor MicrocodeExecutor;
 
-    private int CurrentInstruction = 0;
     private int CurrentMicrocodeRow = 0;
 
     private void Awake()
@@ -204,7 +203,7 @@ public class GameManager : MonoBehaviour
         inputFieldMAR.text = RegisterManager.Instance.GetRegisterValue("MAR").ToString("X8");
         inputFieldMDR.text = RegisterManager.Instance.GetRegisterValue("MDR").ToString("X8");
 
-        Debug.Log("Zaktualizowano rejestry");
+        //Debug.Log("Zaktualizowano rejestry");
     }
 
     public void MakeAnAction(bool isForward)
@@ -391,18 +390,27 @@ public class GameManager : MonoBehaviour
 
     public int ExecuteMicrocode(int steps) {
         int currentMicrocodeRow = CurrentMicrocodeRow;
-        int currentInstruction = CurrentInstruction;
+        int currentInstruction = MicrocodeExecutor.Instance.GetCurrentInstruction() / 4;
+        Debug.Log(currentInstruction.ToString());
+
         int currentStep = 0;
         string[] instructionArray;
         string mnemonic;
         int lastStepIndex;
         while (currentStep < steps)
         {
-            instructionArray = InstructionManager.GetInstruction(currentInstruction);
+            instructionArray = InstructionManager.Instance.GetInstruction(currentInstruction);
             mnemonic = instructionArray[0];
             string[] args = TextParser.SplitText(instructionArray[1]);
             int[] argsType = TextParser.AnalyzeWords(args);
-            MicrocodeTable currentTable = MicrocodeManager.Instance.GetMicrocodeTable(mnemonic);
+            MicrocodeTable currentTable;
+            if (MicrocodeExecutor.Instance.GetStartBool())
+            {
+                currentTable = MicrocodeManager.Instance.GetMicrocodeTable("START");
+            }
+            else {
+                currentTable = MicrocodeManager.Instance.GetMicrocodeTable(mnemonic);
+            }
             lastStepIndex = currentTable.Count();
             while (currentMicrocodeRow < lastStepIndex)
             {
@@ -415,7 +423,6 @@ public class GameManager : MonoBehaviour
             }
             if (currentMicrocodeRow == lastStepIndex)
             {
-                CurrentInstruction++;
                 CurrentMicrocodeRow = 0;
             }
         }

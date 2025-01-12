@@ -24,7 +24,22 @@ public class MemoryManager : MonoBehaviour
     public void InitializeMemory()
     {
         memory = new byte[memorySize];
+        ResetMemory();
         Debug.Log("Pamiêæ zosta³a zainicjalizowana.");
+    }
+
+    public void ResetMemory() {
+        for (int i = 512; i < memorySize; i = i + 4) {
+            WriteInt(i, 0);
+        }
+        for (int i = 0; i < 32; i++)
+        {
+            WriteInt(512 + 4 * i, i + 1);
+        }
+        for (int i = 0; i < 16; i++)
+        {
+            WriteInt(704 + 4 * i, 1);
+        }
     }
 
     public int GetMemorySize()

@@ -200,7 +200,6 @@ public class ViewcodeManager : MonoBehaviour
 
         // Usuń instrukcję z listy
         if (InstructionManager.Instance.getInstructionList().Contains(instruction)){
-            InstructionManager.Instance.getInstructionList().Remove(instruction);
             InstructionManager.Instance.RemoveInstruction(instruction);
         }
         else{
@@ -215,7 +214,7 @@ public class ViewcodeManager : MonoBehaviour
 
     public void RemoveAllInstructions(string instruction)
     {
-        InstructionManager.Instance.getInstructionList().RemoveAll(i => i[0] == instruction);
+        //InstructionManager.Instance.getInstructionList().RemoveAll(i => i[0] == instruction);
         InstructionManager.Instance.RemoveInstructionList(instruction);
         dropdown.value = 0; // prevents dropdown value to be out of range
         createListOfInstructions();
@@ -236,10 +235,10 @@ public class ViewcodeManager : MonoBehaviour
             return;
         }
 
-        string[] temp = lista[index];
+        //string[] temp = lista[index];
 
-        lista[index] = lista[index - 1];
-        lista[index - 1] = temp;
+        //lista[index] = lista[index - 1];
+        //lista[index - 1] = temp;
 
         InstructionManager.Instance.Swap(index - 1, index);
 
@@ -254,10 +253,10 @@ public class ViewcodeManager : MonoBehaviour
             return;
         }
 
-        string[] temp = lista[index];
+        //string[] temp = lista[index];
 
-        lista[index] = lista[index + 1];
-        lista[index + 1] = temp;
+        //lista[index] = lista[index + 1];
+        //lista[index + 1] = temp;
 
         InstructionManager.Instance.Swap(index, index + 1);
 

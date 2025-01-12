@@ -13,6 +13,7 @@ public class MicrocodeExecutor : MonoBehaviour
     private string lastDest;
     private bool StartMnemonic = true;
     private bool JumpToLabel = false;
+    private int CurrentInstruction = 0;
 
     private void Awake()
     {
@@ -64,9 +65,16 @@ public class MicrocodeExecutor : MonoBehaviour
     {
         this.JumpToLabel = jump;
     }
+    public int GetCurrentInstruction() { 
+        return this.CurrentInstruction;
+    }
+    public void SetCurrentInstruction(int index) { 
+        this.CurrentInstruction = index;
+    }
 
     public bool Execute(int currentAddress, string[] args, int[] argsType)
     {
+        
         var row = MicrocodeTable.GetRow(currentAddress);
         if (row == null)
         {
@@ -98,15 +106,18 @@ public class MicrocodeExecutor : MonoBehaviour
 
             if (!string.IsNullOrEmpty(row.Dest))
             {
-                Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
+                //Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
+                if (StartMnemonic) {
+                    RegisterManager.Instance.GetRegisterValue("PC");
+                }
                 RegisterManager.Instance.SetRegisterValue(row.Dest, result);
                 lastDest = row.Dest;
-                Debug.Log("Po wykonaniu ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
+                //Debug.Log("Po wykonaniu ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
             }
         }
 
         // Obs³uga skoków
-        if (!string.IsNullOrEmpty(row.JCond) && !string.IsNullOrEmpty(row.Adr))
+        if (!string.IsNullOrEmpty(row.JCond))
         {
             int value = row.ALU switch {
                 "S1" => RegisterManager.Instance.GetRegisterValue(row.S1),
@@ -128,11 +139,8 @@ public class MicrocodeExecutor : MonoBehaviour
 
             if (conditionMet)
             {
-                StartMnemonic = true;
-                //currentAddress = int.Parse(row.Adr, System.Globalization.NumberStyles.HexNumber);
-            }
-            else {
-                JumpToLabel = false;
+                Debug.Log("Wykonuje skok!");
+                StartMnemonic = !StartMnemonic;
             }
         }
         // Obs³uga Mem
@@ -145,6 +153,10 @@ public class MicrocodeExecutor : MonoBehaviour
                     memoryIndex = RegisterManager.Instance.GetRegisterValue(row.MAdr);
                     value = MemoryManager.ReadInt(memoryIndex);
                     RegisterManager.Instance.SetRegisterValue(row.MDest, value);
+                    if (StartMnemonic) { 
+                        Debug.Log("Zapisuje w IR liczbe: " + Instance.CurrentInstruction.ToString());
+                        Instance.CurrentInstruction = memoryIndex;
+                    }
                     break;
                 case "Write":
                     memoryIndex = RegisterManager.Instance.GetRegisterValue(row.MAdr);

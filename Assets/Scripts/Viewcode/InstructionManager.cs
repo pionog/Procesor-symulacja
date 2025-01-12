@@ -68,7 +68,7 @@ public class InstructionManager : MonoBehaviour
             IR = Int32.Parse(parts[0].Remove(0, 2), System.Globalization.NumberStyles.HexNumber);
         }
         registersList.Add(new int[] { originIndex * 4, IR });
-        Debug.Log((originIndex * 4).ToString() + ", " +IR.ToString());
+        //Debug.Log((originIndex * 4).ToString() + ", " +IR.ToString());
     }
 
     public void RemoveInstruction(string[] instruction) { 
@@ -176,7 +176,7 @@ public class InstructionManager : MonoBehaviour
             return 0;
         }
         else {
-            Debug.Log(originIndex.ToString() + " " + destinationIndex.ToString());
+            //Debug.Log(originIndex.ToString() + " " + destinationIndex.ToString());
             originIndex *= 4;
             destinationIndex *= 4;
             int result = destinationIndex - (originIndex + 4);

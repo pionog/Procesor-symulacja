@@ -29,7 +29,7 @@ public class MicrocodeManager : MonoBehaviour
                 MicrocodeTable start = new MicrocodeTable();
                 MicrocodeRow startRow = new MicrocodeRow() { Address = 0, Mem = "Read", MAdr = "PC", MDest = "IR" };
                 start.AddRow(startRow);
-                startRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1 = "PC", S2 = "Const", Dest = "PC", Const = 4, Regs = "RR" };
+                startRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1 = "PC", S2 = "Const", Dest = "PC", Const = 4, JCond="True", Regs = "RR" };
                 start.AddRow(startRow);
                 start.SetRemovable(false);
                 start.SetEditable(false);
