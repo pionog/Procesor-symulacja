@@ -19,7 +19,12 @@ public class InstructionManager : MonoBehaviour
 
     public void setInstructions(List<string[]> instructions) {
         instructionList = instructions;
-        //UpdateIR();
+        int len = instructionList.Count;
+        registersList = new List<int[]>();
+        for (int i = 0; i < len; i++) {
+            registersList.Add(new int[]{i * 4, 0 });
+        }
+        UpdateIR();
     }
 
     private void Awake()
@@ -33,12 +38,13 @@ public class InstructionManager : MonoBehaviour
         {
             Instance = this;
             instructionList = new List<string[]>();
+            registersList = new List<int[]>();
             DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
         }
     }
-    public void AddInstruction(string[] instruction) { 
-        instructionList.Add(instruction);
-        int originIndex = instructionList.IndexOf(instruction);
+    public void AddInstruction(string[] instruction) {
+        Instance.getInstructionList().Add(instruction);
+        int originIndex = Instance.getInstructionList().IndexOf(instruction);
         int IR = 0;
         string[] strings = TextParser.SplitText(instruction[1]);
         int[] types = TextParser.AnalyzeWords(strings);
@@ -52,15 +58,15 @@ public class InstructionManager : MonoBehaviour
     }
 
     public void RemoveInstruction(string[] instruction) { 
-        int index = instructionList.IndexOf(instruction);
-        instructionList.Remove(instruction);
+        int index = Instance.getInstructionList().IndexOf(instruction);
+        Instance.getInstructionList().Remove(instruction);
         registersList.RemoveAt(index);
         UpdateIR();
     }
 
-    public void RemoveInstructionList(string instruction) { 
-        instructionList.RemoveAll(i => i[0] == instruction);
-        var instructions = instructionList
+    public void RemoveInstructionList(string instruction) {
+        Instance.getInstructionList().RemoveAll(i => i[0] == instruction);
+        var instructions = Instance.getInstructionList()
             .Where(array => array.Length > 2)
             .Select(array => array[0])
             .ToList();
@@ -85,7 +91,7 @@ public class InstructionManager : MonoBehaviour
 
     public void Swap(int first, int second) { 
         if (first == second) return;
-        int len = instructionList.Count - 1;
+        int len = Instance.getInstructionList().Count - 1;
         if (0 > first || first > len) {
             Debug.Log("Pierwszy indeks jest spoza zakresu!");
             throw new Exception($"{first} jest spoza mozliwego zakresu (0-{len})!");
@@ -95,10 +101,11 @@ public class InstructionManager : MonoBehaviour
             Debug.Log("Drugi indeks jest spoza zakresu!");
             throw new Exception($"{second} jest spoza mozliwego zakresu (0-{len})!");
         }
-        string[] temp = instructionList[second];
+        List<string[]> lista = Instance.getInstructionList();
+        string[] temp = lista[second];
         int[] tempInt = registersList[second];
-        instructionList[second] = instructionList[first];
-        instructionList[first] = temp;
+        lista[second] = lista[first];
+        lista[first] = temp;
         registersList[second] = registersList[first];
         registersList[first] = tempInt;
         UpdateIR();
@@ -107,9 +114,9 @@ public class InstructionManager : MonoBehaviour
 
     public void UpdateIR()
     {
-        for (int i = 0; i < instructionList.Count; i++)
+        for (int i = 0; i < Instance.getInstructionList().Count; i++)
         {
-            string[] strings = TextParser.SplitText(instructionList[i][1]); // rozdzielanie slow po przecinku
+            string[] strings = TextParser.SplitText(Instance.getInstructionList()[i][1]); // rozdzielanie slow po przecinku
             int[] types = TextParser.AnalyzeWords(strings); // oznaczanie typow poszczegolnych slow
             if (types.Contains(2))
             { // jesli instrukcja zawiera etykiete
@@ -117,12 +124,12 @@ public class InstructionManager : MonoBehaviour
                 int IR = CalculateIR(strings[labelIndex], i); // obliczanie nowego IR
                 registersList[i][1] = IR; // akutalizowanie wartosci IR
             }
-            Debug.Log("IR dla indeksu " + i.ToString() + ":\t" + registersList[i][1].ToString());
+            //Debug.Log("IR dla indeksu " + i.ToString() + ":\t" + registersList[i][1].ToString());
         }
     }
 
     public int CalculateIR(string label, int originIndex) {
-        var LabelsList = instructionList
+        var LabelsList = Instance.getInstructionList()
             .Where(array => array.Length > 2)
             .Select(array => array[2])
             .ToList();
@@ -144,8 +151,8 @@ public class InstructionManager : MonoBehaviour
     public override string ToString()
     {
         string result = "";
-        int len = instructionList.Count - 1;
-        foreach (string[] instruction in instructionList)
+        int len = Instance.getInstructionList().Count - 1;
+        foreach (string[] instruction in Instance.getInstructionList())
         {
             result += "{";
             foreach (string s in instruction) { 
@@ -158,7 +165,7 @@ public class InstructionManager : MonoBehaviour
                     result += "\"";
                 }
             }
-            if (instruction != instructionList[len])
+            if (instruction != Instance.getInstructionList()[len])
             {
                 result += "}, ";
             }
