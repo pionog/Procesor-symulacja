@@ -86,13 +86,13 @@ public class ViewcodeManager : MonoBehaviour
             instructionInputField.onEndEdit.AddListener(newText =>
             {
                 List<string> list = new List<string>();
-                foreach (string[] s in instructionList) {
+                foreach (string[] s in InstructionManager.Instance.getInstructionList()) {
                     list.Add(s[2]);
                 }
                 newText = TextParser.IndicateErrors(newText, list);
                 instruction[1] = newText;
                 instructionInputField.text = newText;
-                InstructionManager.UpdateIR();
+                InstructionManager.Instance.UpdateIR();
             });
 
 
@@ -224,7 +224,6 @@ public class ViewcodeManager : MonoBehaviour
     public void AddNewInstruction(string instruction)
     {
         string[] newInstruction = new string[] { instruction, "", "" };
-        InstructionManager.Instance.getInstructionList().Add(newInstruction);
         InstructionManager.Instance.AddInstruction(newInstruction);
         createListOfInstructions();
     }

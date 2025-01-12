@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Unity.Collections;
 using UnityEngine;
 
 public class InstructionManager : MonoBehaviour
@@ -52,6 +53,19 @@ public class InstructionManager : MonoBehaviour
         if (types.Contains(2)) {
             int labelIndex = Array.IndexOf(types, 2);
             IR = CalculateIR(strings[labelIndex], originIndex);
+        }
+        else if (types.Contains(1))
+        {
+            int labelIndex = Array.IndexOf(types, 1);
+            string numberToParse = strings[labelIndex];
+            IR = Int32.Parse(numberToParse.Remove(0, 2), System.Globalization.NumberStyles.HexNumber);
+        }
+        else if (types.Contains(3))
+        {
+            int labelIndex = Array.IndexOf(types, 3);
+            string numberToParse = strings[labelIndex]; // e.g. "0x0020(R1)"
+            string[] parts = numberToParse.Split('('); // [0] = "0x0020", [1] = "R1)"
+            IR = Int32.Parse(parts[0].Remove(0, 2), System.Globalization.NumberStyles.HexNumber);
         }
         registersList.Add(new int[] { originIndex * 4, IR });
         Debug.Log((originIndex * 4).ToString() + ", " +IR.ToString());
@@ -114,16 +128,37 @@ public class InstructionManager : MonoBehaviour
 
     public void UpdateIR()
     {
+        if (MemoryManager.Instance == null)
+        {
+            MemoryManager.Instance = gameObject.AddComponent<MemoryManager>();
+        }
         for (int i = 0; i < Instance.getInstructionList().Count; i++)
         {
             string[] strings = TextParser.SplitText(Instance.getInstructionList()[i][1]); // rozdzielanie slow po przecinku
             int[] types = TextParser.AnalyzeWords(strings); // oznaczanie typow poszczegolnych slow
+            int IR = 0;
             if (types.Contains(2))
             { // jesli instrukcja zawiera etykiete
                 int labelIndex = Array.IndexOf(types, 2); // indeks etykiety w porozdzielanych slowach
-                int IR = CalculateIR(strings[labelIndex], i); // obliczanie nowego IR
+                IR = CalculateIR(strings[labelIndex], i); // obliczanie nowego IR
                 registersList[i][1] = IR; // akutalizowanie wartosci IR
             }
+            else if (types.Contains(1))
+            {
+                int labelIndex = Array.IndexOf(types, 1);
+                string numberToParse = strings[labelIndex];
+                IR = Int32.Parse(numberToParse.Remove(0,2), System.Globalization.NumberStyles.HexNumber);
+                registersList[i][1] = IR;
+            }
+            else if (types.Contains(3))
+            {
+                int labelIndex = Array.IndexOf(types, 3);
+                string numberToParse = strings[labelIndex]; // e.g. "0x0020(R1)"
+                string[] parts = numberToParse.Split('('); // [0] = "0x0020", [1] = "R1)"
+                IR = Int32.Parse(parts[0].Remove(0, 2), System.Globalization.NumberStyles.HexNumber);
+                registersList[i][1] = IR;
+            }
+            MemoryManager.Instance.WriteInt(i * 4, IR);
             //Debug.Log("IR dla indeksu " + i.ToString() + ":\t" + registersList[i][1].ToString());
         }
     }
@@ -141,6 +176,7 @@ public class InstructionManager : MonoBehaviour
             return 0;
         }
         else {
+            Debug.Log(originIndex.ToString() + " " + destinationIndex.ToString());
             originIndex *= 4;
             destinationIndex *= 4;
             int result = destinationIndex - (originIndex + 4);

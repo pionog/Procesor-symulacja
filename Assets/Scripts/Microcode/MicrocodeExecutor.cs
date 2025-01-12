@@ -77,8 +77,8 @@ public class MicrocodeExecutor : MonoBehaviour
         // Obs³uga ALU
         if (!string.IsNullOrEmpty(row.ALU))
         {
-            int s1 = !string.IsNullOrEmpty(row.S1) ? (row.S1 == "Const" ? (int)row.Const : row.S1 == "IR" ? 0 : RegisterManager.Instance.GetRegisterValue(row.S1)) : 0;
-            int s2 = !string.IsNullOrEmpty(row.S2) ? (row.S2 == "Const" ? (int)row.Const : row.S2 == "IR" ? 0 : RegisterManager.Instance.GetRegisterValue(row.S2)) : 0;
+            int s1 = !string.IsNullOrEmpty(row.S1) ? (row.S1 == "Const" ? (int)row.Const : RegisterManager.Instance.GetRegisterValue(row.S1)) : 0;
+            int s2 = !string.IsNullOrEmpty(row.S2) ? (row.S2 == "Const" ? (int)row.Const : RegisterManager.Instance.GetRegisterValue(row.S2)) : 0;
 
             int result = row.ALU switch
             {
@@ -98,10 +98,10 @@ public class MicrocodeExecutor : MonoBehaviour
 
             if (!string.IsNullOrEmpty(row.Dest))
             {
-                //Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
+                Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
                 RegisterManager.Instance.SetRegisterValue(row.Dest, result);
                 lastDest = row.Dest;
-                //Debug.Log("Po wykonaniu ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
+                Debug.Log("Po wykonaniu ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
             }
         }
 

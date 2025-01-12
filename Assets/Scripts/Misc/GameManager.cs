@@ -402,12 +402,12 @@ public class GameManager : MonoBehaviour
             mnemonic = instructionArray[0];
             string[] args = TextParser.SplitText(instructionArray[1]);
             int[] argsType = TextParser.AnalyzeWords(args);
-            MicrocodeTable currentTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
+            MicrocodeTable currentTable = MicrocodeManager.Instance.GetMicrocodeTable(mnemonic);
             lastStepIndex = currentTable.Count();
             while (currentMicrocodeRow < lastStepIndex)
             {
-                MicrocodeExecutor.SetMicrocodeTable(currentTable);
-                MicrocodeExecutor.Execute(currentMicrocodeRow, args, argsType);
+                MicrocodeExecutor.Instance.SetMicrocodeTable(currentTable);
+                MicrocodeExecutor.Instance.Execute(currentMicrocodeRow, args, argsType);
                 currentMicrocodeRow++;
                 CurrentMicrocodeRow++;
                 currentStep++;

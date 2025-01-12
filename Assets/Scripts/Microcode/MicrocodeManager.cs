@@ -53,7 +53,7 @@ public class MicrocodeManager : MonoBehaviour
 
                 //load mnemonic
                 MicrocodeTable load = new MicrocodeTable();
-                MicrocodeRow loadRow = new MicrocodeRow() { Address = 0, ALU = "ADD", S1 = "A", S2 = "IR", Dest = "MAR" };
+                MicrocodeRow loadRow = new MicrocodeRow() { Address = 0, ALU = "ADD", S1 = "IR", S2 = "B", Dest = "MAR" };
                 load.AddRow(loadRow);
                 loadRow = new MicrocodeRow() { Address = 1, Mem = "Read", MAdr = "MAR", MDest = "MDR" };
                 load.AddRow(loadRow);
@@ -65,9 +65,9 @@ public class MicrocodeManager : MonoBehaviour
 
                 //store mnemonic
                 MicrocodeTable store = new MicrocodeTable();
-                MicrocodeRow storeRow = new MicrocodeRow() { Address = 0, ALU = "S2", S2 = "B", Dest = "MDR" };
+                MicrocodeRow storeRow = new MicrocodeRow() { Address = 0, ALU = "S2", S1 = "A", Dest = "MDR" };
                 store.AddRow(storeRow);
-                storeRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1 = "A", S2 = "IR", Dest = "MAR" };
+                storeRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1 = "IR", S2 = "B", Dest = "MAR" };
                 store.AddRow(storeRow);
                 storeRow = new MicrocodeRow() { Address = 2, JCond = "True", Mem = "Write", MAdr = "MAR", MDest = "MDR" };
                 store.AddRow(storeRow);
