@@ -21,14 +21,11 @@ public class MicrocodeListManager : MonoBehaviour
 
     void Start()
     {
-        MicrocodeManager = MicrocodeManager.Instance;
+        foreach (string mnemonic in MicrocodeManager.Instance.getmicrocodeTables().Keys) {
+            mnemonics.Add(mnemonic);
+        }
         //// Przyk�adowe mnemoniki
-        mnemonics.Add("START");
-        mnemonics.Add("ADD");
-        mnemonics.Add("SUB");
-        mnemonics.Add("LOAD");
-        mnemonics.Add("STORE");
-        mnemonics.Add("MOV");
+
         RefreshList();
     }
 
@@ -145,7 +142,7 @@ public class MicrocodeListManager : MonoBehaviour
         editButton.GetComponent<Button>().onClick.AddListener(() => EditMnemonic(mnemonic));
 
         GameObject deleteButton = Instantiate(optionButtonPrefab, optionContainer.transform);
-        if (!MicrocodeManager.GetMicrocodeTable(mnemonic).GetRemovable()) {
+        if (!MicrocodeManager.Instance.GetMicrocodeTable(mnemonic).GetRemovable()) {
             deleteButton.GetComponent<Button>().interactable = false;
         }
 
@@ -168,7 +165,7 @@ public class MicrocodeListManager : MonoBehaviour
     {
         Debug.Log($"Edycja mnemonika: {mnemonic}");
         // Logika edycji
-        MicrocodeEditor.MicrocodeTable = MicrocodeManager.GetMicrocodeTable(mnemonic);
+        MicrocodeEditor.MicrocodeTable = MicrocodeManager.Instance.GetMicrocodeTable(mnemonic);
         MicrocodeEditor.Mnemonic = mnemonic;
         Debug.Log(MicrocodeEditor.MicrocodeTable.ToString());
         
@@ -218,7 +215,7 @@ public class MicrocodeListManager : MonoBehaviour
             MicrocodeRow row = new MicrocodeRow();
             row.Label = mnemonic;
             newMicrocodeTable.AddRow(row);
-            MicrocodeManager.AddMicrocodeTable(mnemonic, newMicrocodeTable);
+            MicrocodeManager.Instance.AddMicrocodeTable(mnemonic, newMicrocodeTable);
             AddMnemonicButton(mnemonic);
             mnemonics.Add(mnemonic);
         }

@@ -19,6 +19,7 @@ public class InstructionManager : MonoBehaviour
 
     public void setInstructions(List<string[]> instructions) {
         instructionList = instructions;
+        //UpdateIR();
     }
 
     private void Awake()

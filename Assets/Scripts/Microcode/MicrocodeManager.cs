@@ -4,19 +4,9 @@ using UnityEngine;
 
 public class MicrocodeManager : MonoBehaviour
 {
-    // S�ownik przechowuj�cy tabele mikrokod�w dla r�nych mnemonik�w
+    // Słownik przechowujący tabele mikrokodów dla różnych mnemoników
     private Dictionary<string, MicrocodeTable> microcodeTables;
     public static MicrocodeManager Instance;
-
-    public LoadManager load;
-
-    public Dictionary<string, MicrocodeTable> getmicrocodeTables() {
-        return microcodeTables;
-    }
-
-    public void setMicrocodeTables(Dictionary<string, MicrocodeTable> tables) {
-        microcodeTables = tables;
-    }
 
     private void Awake()
     {
@@ -28,14 +18,18 @@ public class MicrocodeManager : MonoBehaviour
         else
         {
             Instance = this;
+            
+            DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
+
             microcodeTables = new Dictionary<string, MicrocodeTable>();
 
-            if(!load.gameFromSave){
+            if (!LoadManager.Instance.gameFromSave)
+            {
                 //start mnemonic
                 MicrocodeTable start = new MicrocodeTable();
                 MicrocodeRow startRow = new MicrocodeRow() { Address = 0, Mem = "Read", MAdr = "PC", MDest = "IR" };
                 start.AddRow(startRow);
-                startRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1="PC", S2="Const", Dest = "PC", Const = 4, Regs = "RR"};
+                startRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1 = "PC", S2 = "Const", Dest = "PC", Const = 4, Regs = "RR" };
                 start.AddRow(startRow);
                 start.SetRemovable(false);
                 start.SetEditable(false);
@@ -43,9 +37,9 @@ public class MicrocodeManager : MonoBehaviour
 
                 //add mnemonic
                 MicrocodeTable add = new MicrocodeTable();
-                MicrocodeRow addRow = new MicrocodeRow() { Address = 0, ALU="ADD", S1="A", S2="B", Dest="C"};
+                MicrocodeRow addRow = new MicrocodeRow() { Address = 0, ALU = "ADD", S1 = "A", S2 = "B", Dest = "C" };
                 add.AddRow(addRow);
-                addRow = new MicrocodeRow() { Address = 1, JCond="True", Regs="WF3" };
+                addRow = new MicrocodeRow() { Address = 1, JCond = "True", Regs = "WF3" };
                 add.AddRow(addRow);
                 microcodeTables.Add("ADD", add);
 
@@ -75,21 +69,31 @@ public class MicrocodeManager : MonoBehaviour
                 store.AddRow(storeRow);
                 storeRow = new MicrocodeRow() { Address = 1, ALU = "ADD", S1 = "A", S2 = "IR", Dest = "MAR" };
                 store.AddRow(storeRow);
-                storeRow = new MicrocodeRow() { Address = 2, JCond="True", Mem = "Write", MAdr = "MAR", MDest = "MDR" };           
+                storeRow = new MicrocodeRow() { Address = 2, JCond = "True", Mem = "Write", MAdr = "MAR", MDest = "MDR" };
                 store.AddRow(storeRow);
                 microcodeTables.Add("STORE", store);
 
                 //move mnemonic
                 MicrocodeTable move = new MicrocodeTable();
-                MicrocodeRow moveRow = new MicrocodeRow() { Address = 0, ALU = "ADD", S1="Const", S2 = "B", Dest = "C", Const = 0 };
+                MicrocodeRow moveRow = new MicrocodeRow() { Address = 0, ALU = "ADD", S1 = "Const", S2 = "B", Dest = "C", Const = 0 };
                 move.AddRow(moveRow);
-                moveRow = new MicrocodeRow() { Address = 1, JCond = "True", Regs="WF1" };
+                moveRow = new MicrocodeRow() { Address = 1, JCond = "True", Regs = "WF1" };
                 move.AddRow(moveRow);
                 microcodeTables.Add("MOV", move);
             }
-            
-            DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
+
+
         }
+    }
+
+    public Dictionary<string, MicrocodeTable> getmicrocodeTables()
+    {
+        return microcodeTables;
+    }
+
+    public void setMicrocodeTables(Dictionary<string, MicrocodeTable> tables)
+    {
+        microcodeTables = tables;
     }
 
     // Dodawanie istniej�cej tabeli mikrokod�w do s�ownika

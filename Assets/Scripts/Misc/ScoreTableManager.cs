@@ -10,7 +10,7 @@ public class ScoreTableManager : MonoBehaviour
     public GameObject rowPrefab; // Prefab wiersza tabeli (RowScoreLabel)
     public int menuType;
 
-    public LoadManager load;
+    public LoadManager load = LoadManager.Instance;
 
     public Color normalColor = Color.white;   // Default color
     public Color hoverColor = Color.yellow;   // Color on hover

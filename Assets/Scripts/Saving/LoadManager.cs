@@ -30,6 +30,7 @@ public class LoadManager : MonoBehaviour
     }
 
     public void loadGame(string nickname, string timeDate) {
+        Debug.Log("LoadManager: Wczytywanie gry");
         gameFromSave = true;
         nick = nickname;
         date = timeDate;

@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour
     public TMP_InputField inputFieldMDR;
     public TMP_InputField inputFieldIR;
     public TMP_InputField inputFieldNickname;
-    public LoadManager load;
     
     private Dictionary<string, TMP_Text> registerTexts = new Dictionary<string, TMP_Text>();
 
@@ -71,7 +70,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Initializing game...");
 
-        if(load.gameFromSave) { //odkomentuj jak komunikacja działa
+        if(LoadManager.Instance.gameFromSave) { //odkomentuj jak komunikacja działa
             LoadFromSave(); //wylacz popupy, ustaw dane w skryptach, daj na gre od razu
         }
 
@@ -82,8 +81,8 @@ public class GameManager : MonoBehaviour
         PopulateInstruction();
         PopulateMicrocodeExecutor();
 
-        MicrocodeExecutor.SetMemoryManager(MemoryManager);
-        MicrocodeExecutor.SetRegisterManager(RegisterManager);
+        MicrocodeExecutor.Instance.SetMemoryManager(MemoryManager);
+        MicrocodeExecutor.Instance.SetRegisterManager(RegisterManager);
         Score.text = gameScore.ToString();
     }
 
@@ -231,6 +230,8 @@ public class GameManager : MonoBehaviour
         [SerializeField] public bool Removable { get; set; }
         [SerializeField] public bool Editable { get; set; }
 
+        public MicrocodeTableEntry() { }
+
         public MicrocodeTableEntry(string key, MicrocodeTable microcodeTable)
         {
             Key = key;
@@ -251,6 +252,8 @@ public class GameManager : MonoBehaviour
         public List<List<string>> instructionList;
         public List<MicrocodeTableEntry> microcodeTables;
 
+        public GameData() { }
+
         public GameData(int score, string nickname, List<string[]> instructions, Dictionary<string, MicrocodeTable> microcodeTableDict)
         {
             this.score = score;
@@ -262,7 +265,6 @@ public class GameManager : MonoBehaviour
             foreach (var array in instructions){
                 this.instructionList.Add(new List<string>(array));
             }
-
             this.microcodeTables = new List<MicrocodeTableEntry>();
 
             foreach (var kvp in microcodeTableDict){
@@ -286,11 +288,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void saveGame() {
-        List<string[]> instructionList = InstructionManager.getInstructionList();
-        
-        Dictionary<string, MicrocodeTable> microcodeTable = MicrocodeManager.getmicrocodeTables();
 
-        GameData gameData = new GameData(gameScore, nickname, instructionList, microcodeTable);
+        GameData gameData = new GameData(gameScore, nickname, InstructionManager.Instance.getInstructionList(), MicrocodeManager.Instance.getmicrocodeTables());
 
         string jsonData = JsonConvert.SerializeObject(gameData, Formatting.Indented);
 
@@ -313,6 +312,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void LoadFromSave() {
+        Debug.Log("Wczytuje zapis.");
         welcomePopup.SetActive(false);
         backgroundFadeout.SetActive(false);
         settingsButton.SetActive(true);
@@ -321,7 +321,7 @@ public class GameManager : MonoBehaviour
         architecturePanel.SetActive(true);
         scoreText.SetActive(true);
 
-        string filePath = Path.Combine(Application.persistentDataPath, $"save_{load.nick}_{load.date}.json");
+        string filePath = Path.Combine(Application.persistentDataPath, $"save_{LoadManager.Instance.nick}_{LoadManager.Instance.date}.json");
 
         if (File.Exists(filePath))
         {
@@ -347,6 +347,7 @@ public class GameManager : MonoBehaviour
             foreach (var entry in microcodeTables)
             {
                 MicrocodeTable table = new MicrocodeTable();
+                
 
                 table.SetMicrocodeType(entry.MicrocodeType);
                 table.SetRegistersNumber(entry.RegistersNumber);
@@ -357,11 +358,20 @@ public class GameManager : MonoBehaviour
                     table.AddRow(row);
                 }
 
+
                 microcodeTableDict[entry.Key] = table;
             }
 
-            MicrocodeManager.setMicrocodeTables(microcodeTableDict);
-            InstructionManager.setInstructions(instructions);
+            if (MicrocodeManager.Instance == null) {
+                MicrocodeManager.Instance = gameObject.AddComponent<MicrocodeManager>();
+            }
+            if (InstructionManager.Instance == null)
+            {
+                InstructionManager.Instance = gameObject.AddComponent<InstructionManager>();
+            }
+
+            MicrocodeManager.Instance.setMicrocodeTables(microcodeTableDict);
+            InstructionManager.Instance.setInstructions(instructions);
         }
         else
         {
