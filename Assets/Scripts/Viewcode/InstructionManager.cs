@@ -147,7 +147,11 @@ public class InstructionManager : MonoBehaviour
             {
                 int labelIndex = Array.IndexOf(types, 1);
                 string numberToParse = strings[labelIndex];
-                IR = Int32.Parse(numberToParse.Remove(0,2), System.Globalization.NumberStyles.HexNumber);
+                bool parsed = int.TryParse(numberToParse, out IR); // decimal number
+                if (!parsed)
+                {
+                    IR = Int32.Parse(numberToParse.Remove(0, 2), System.Globalization.NumberStyles.HexNumber); // hex number
+                }
                 registersList[i][1] = IR;
             }
             else if (types.Contains(3))

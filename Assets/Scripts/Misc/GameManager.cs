@@ -390,8 +390,9 @@ public class GameManager : MonoBehaviour
 
     public int ExecuteMicrocode(int steps) {
         int currentMicrocodeRow = CurrentMicrocodeRow;
+        //Debug.Log("Obecny wiersz to: " +  currentMicrocodeRow.ToString());
         int currentInstruction = MicrocodeExecutor.Instance.GetCurrentInstruction() / 4;
-        Debug.Log(currentInstruction.ToString());
+        //Debug.Log("Instrukcja numer: " + currentInstruction.ToString());
 
         int currentStep = 0;
         string[] instructionArray;
@@ -404,7 +405,9 @@ public class GameManager : MonoBehaviour
             string[] args = TextParser.SplitText(instructionArray[1]);
             int[] argsType = TextParser.AnalyzeWords(args);
             MicrocodeTable currentTable;
-            if (MicrocodeExecutor.Instance.GetStartBool())
+            bool isStart = MicrocodeExecutor.Instance.GetStartBool();
+            bool changedState = false;
+            if (isStart)
             {
                 currentTable = MicrocodeManager.Instance.GetMicrocodeTable("START");
             }
@@ -419,10 +422,16 @@ public class GameManager : MonoBehaviour
                 currentMicrocodeRow++;
                 CurrentMicrocodeRow++;
                 currentStep++;
+                if (!isStart && MicrocodeExecutor.Instance.GetStartBool()){
+                    Debug.Log("Przechodze do mnemonika START");
+                    changedState = true;
+                    break;
+                }
                 if (currentStep == steps) break;
             }
-            if (currentMicrocodeRow == lastStepIndex)
+            if ((currentMicrocodeRow == lastStepIndex)||changedState)
             {
+                currentMicrocodeRow = 0;
                 CurrentMicrocodeRow = 0;
             }
         }
