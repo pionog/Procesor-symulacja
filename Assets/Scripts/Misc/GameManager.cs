@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using Newtonsoft.Json;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public Transform content; // Przypisz Content z hierarchii w inspektorze
-    public GameObject tmpTextPrefab; // Prefab TMP_Text jako GameObject (utwórz prefab i przypisz go)
+    public GameObject tmpTextPrefab; // Prefab TMP_Text jako GameObject (utwï¿½rz prefab i przypisz go)
 
     public TMP_InputField inputFieldA;
     public TMP_InputField inputFieldB;
@@ -19,9 +21,21 @@ public class GameManager : MonoBehaviour
     public TMP_InputField inputFieldPC;
     public TMP_InputField inputFieldMAR;
     public TMP_InputField inputFieldMDR;
+    public TMP_InputField inputFieldIR;
+    public TMP_InputField inputFieldNickname;
+    
     private Dictionary<string, TMP_Text> registerTexts = new Dictionary<string, TMP_Text>();
 
+    public GameObject welcomePopup;
+    public GameObject backgroundFadeout;
+    public GameObject settingsButton;
+    public GameObject tabs;
+    public GameObject label;
+    public GameObject architecturePanel;
+    public GameObject scoreText;
+
     public TMP_Text Score;
+    private string nickname;
     private int gameScore = 0;
     public Button ClockButton;
     public Button RewindButton;
@@ -37,7 +51,6 @@ public class GameManager : MonoBehaviour
     private int CurrentInstruction = 0;
     private int CurrentMicrocodeRow = 0;
 
-
     private void Awake()
     {
         // Singleton pattern to ensure only one instance of GameManager exists
@@ -49,17 +62,17 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
+            InitializeGame();
         }
-    }
-
-    private void Start()
-    {
-        InitializeGame();
     }
 
     private void InitializeGame()
     {
         Debug.Log("Initializing game...");
+
+        if(LoadManager.Instance.gameFromSave) { //odkomentuj jak komunikacja dziaÅ‚a
+            LoadFromSave(); //wylacz popupy, ustaw dane w skryptach, daj na gre od razu
+        }
 
         // Pobierz rejestry z RegisterManager
         PopulateRegisters();
@@ -67,10 +80,10 @@ public class GameManager : MonoBehaviour
         PopulateMicrocode();
         PopulateInstruction();
         PopulateMicrocodeExecutor();
-        MicrocodeExecutor.SetMemoryManager(MemoryManager);
-        MicrocodeExecutor.SetRegisterManager(RegisterManager);
+
+        MicrocodeExecutor.Instance.SetMemoryManager(MemoryManager);
+        MicrocodeExecutor.Instance.SetRegisterManager(RegisterManager);
         Score.text = gameScore.ToString();
-        
     }
 
     public void StartGame()
@@ -90,7 +103,7 @@ public class GameManager : MonoBehaviour
     {
         if (RegisterManager.Instance == null)
         {
-            Debug.LogError("RegisterManager.Instance jest null. Upewnij siê, ¿e RegisterManager dzia³a poprawnie.");
+            Debug.LogError("RegisterManager.Instance jest null. Upewnij siï¿½, ï¿½e RegisterManager dziaï¿½a poprawnie.");
             return;
         }
 
@@ -105,11 +118,12 @@ public class GameManager : MonoBehaviour
 
         foreach (var register in generalPurposeRegisters)
         {
-            string registerText = $"{register.Name}: {register.Value.ToString("X8")}"; // Wyœwietlenie w formacie HEX (np. 00000000)
+            string registerText = $"{register.Name}: {register.Value.ToString("X8")}"; // Wyï¿½wietlenie w formacie HEX (np. 00000000)
             AddRegisterToContent(register.Name, registerText);
         }
         RegisterManager.SetRegisterValue("MAR", 16);
         RegisterManager.SetRegisterValue("MDR", 305419896);
+
         UpdateInputFields();
     }
 
@@ -120,15 +134,15 @@ public class GameManager : MonoBehaviour
 
         foreach (var register in generalPurposeRegisters)
         {
-            // SprawdŸ, czy dany rejestr jest wyœwietlany
+            // Sprawdï¿½, czy dany rejestr jest wyï¿½wietlany
             if (registerTexts.TryGetValue(register.Name, out TMP_Text tmpText))
             {
-                // Aktualizuj wartoœæ tekstu
+                // Aktualizuj wartoï¿½ï¿½ tekstu
                 tmpText.text = $"{register.Name}: {register.Value.ToString("X8")}";
             }
             else
             {
-                Debug.LogWarning($"Rejestr {register.Name} nie zosta³ znaleziony w widoku. Mo¿e trzeba go dodaæ.");
+                Debug.LogWarning($"Rejestr {register.Name} nie zostaï¿½ znaleziony w widoku. Moï¿½e trzeba go dodaï¿½.");
             }
         }
     }
@@ -148,14 +162,14 @@ public class GameManager : MonoBehaviour
 
     private void AddRegisterToContent(string registerName, string text)
     {
-        // SprawdŸ, czy prefab zosta³ przypisany
+        // Sprawdï¿½, czy prefab zostaï¿½ przypisany
         if (tmpTextPrefab == null)
         {
-            Debug.LogError("Prefab TMP_TextPrefab nie zosta³ przypisany w GameManager.");
+            Debug.LogError("Prefab TMP_TextPrefab nie zostaï¿½ przypisany w GameManager.");
             return;
         }
 
-        // Utwórz nowy element tekstowy
+        // Utwï¿½rz nowy element tekstowy
         GameObject textObject = Instantiate(tmpTextPrefab, content);
         TMP_Text tmpText = textObject.GetComponent<TMP_Text>();
 
@@ -167,16 +181,17 @@ public class GameManager : MonoBehaviour
 
         tmpText.text = text;
 
-        // Dodaj do s³ownika
+        // Dodaj do sï¿½ownika
         if (!registerTexts.ContainsKey(registerName))
         {
             registerTexts.Add(registerName, tmpText);
         }
         else
         {
-            Debug.LogWarning($"Rejestr o nazwie {registerName} ju¿ istnieje w widoku.");
+            Debug.LogWarning($"Rejestr o nazwie {registerName} juï¿½ istnieje w widoku.");
         }
     }
+
 
     private void UpdateInputFields()
     {
@@ -203,6 +218,169 @@ public class GameManager : MonoBehaviour
         UpdateScore(stepsMade);
         UpdateInputFields();
         UpdateRegisterDisplay();
+    }
+
+    [System.Serializable]
+    public class MicrocodeTableEntry
+    {
+        [SerializeField] public string Key { get; set; }
+        [SerializeField] public List<MicrocodeRow> Rows { get; set; }
+        [SerializeField] public int MicrocodeType { get; set; } 
+        [SerializeField] public int RegistersNumber { get; set; }
+        [SerializeField] public bool Removable { get; set; }
+        [SerializeField] public bool Editable { get; set; }
+
+        public MicrocodeTableEntry() { }
+
+        public MicrocodeTableEntry(string key, MicrocodeTable microcodeTable)
+        {
+            Key = key;
+            Rows = microcodeTable.GetAllRowsList();
+            MicrocodeType = microcodeTable.GetMicrocodeType();
+            RegistersNumber = microcodeTable.GetRegistersNumber();
+            Removable = microcodeTable.GetRemovable();
+            Editable = microcodeTable.GetEditable();
+        }
+    }
+
+    [System.Serializable]
+    public class GameData
+    {
+        public int score;
+        public string nickname;
+        public string timestamp;
+        public List<List<string>> instructionList;
+        public List<MicrocodeTableEntry> microcodeTables;
+
+        public GameData() { }
+
+        public GameData(int score, string nickname, List<string[]> instructions, Dictionary<string, MicrocodeTable> microcodeTableDict)
+        {
+            this.score = score;
+            this.nickname = nickname;
+            this.timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+
+            this.instructionList = new List<List<string>>();
+
+            foreach (var array in instructions){
+                this.instructionList.Add(new List<string>(array));
+            }
+            this.microcodeTables = new List<MicrocodeTableEntry>();
+
+            foreach (var kvp in microcodeTableDict){
+                var entry = new MicrocodeTableEntry(kvp.Key, kvp.Value);
+                this.microcodeTables.Add(entry);
+            }
+        }
+    }
+
+    [System.Serializable]
+    public class ScoreData {
+        public int score;
+        public string nickname;
+        public string timestamp;
+
+        public ScoreData(int score, string nickname){
+            this.score = score;
+            this.nickname = nickname;
+            this.timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        }
+    }
+
+    public void saveGame() {
+
+        GameData gameData = new GameData(gameScore, nickname, InstructionManager.Instance.getInstructionList(), MicrocodeManager.Instance.getmicrocodeTables());
+
+        string jsonData = JsonConvert.SerializeObject(gameData, Formatting.Indented);
+
+        File.WriteAllText(Application.persistentDataPath + "/save_" + nickname 
+            + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".json", jsonData);
+
+        Debug.Log("zapisano w: " + Application.persistentDataPath + "/save_" + nickname 
+            + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".json");
+    }
+
+    public void saveScore() {
+        ScoreData scoreData = new ScoreData(gameScore, nickname);
+        string jsonData = JsonUtility.ToJson(scoreData, true);
+
+        File.WriteAllText(Application.persistentDataPath + "/score_" + nickname 
+            + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".json", jsonData);
+
+        Debug.Log("zapisano w: " + Application.persistentDataPath + "/score_" + nickname 
+            + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".json");
+    }
+
+    public void LoadFromSave() {
+        Debug.Log("Wczytuje zapis.");
+        welcomePopup.SetActive(false);
+        backgroundFadeout.SetActive(false);
+        settingsButton.SetActive(true);
+        tabs.SetActive(true);
+        label.SetActive(true);
+        architecturePanel.SetActive(true);
+        scoreText.SetActive(true);
+
+        string filePath = Path.Combine(Application.persistentDataPath, $"save_{LoadManager.Instance.nick}_{LoadManager.Instance.date}.json");
+
+        if (File.Exists(filePath))
+        {
+            string jsonData = File.ReadAllText(filePath);
+
+            GameData gameData = JsonConvert.DeserializeObject<GameData>(jsonData);
+
+            nickname = gameData.nickname;
+            gameScore = gameData.score;
+
+            List<List<string>> instructionList = gameData.instructionList;
+            List<MicrocodeTableEntry> microcodeTables = gameData.microcodeTables;
+
+            //new data to set
+            List<string[]> instructions = new List<string[]>();
+            Dictionary<string, MicrocodeTable> microcodeTableDict = new Dictionary<string, MicrocodeTable>();
+
+            foreach (var list in instructionList)
+            {
+                instructions.Add(list.ToArray());
+            }
+
+            foreach (var entry in microcodeTables)
+            {
+                MicrocodeTable table = new MicrocodeTable();
+                
+
+                table.SetMicrocodeType(entry.MicrocodeType);
+                table.SetRegistersNumber(entry.RegistersNumber);
+                table.SetRemovable(entry.Removable);
+                table.SetEditable(entry.Editable);
+                
+                foreach (var row in entry.Rows) {
+                    table.AddRow(row);
+                }
+
+
+                microcodeTableDict[entry.Key] = table;
+            }
+
+            if (MicrocodeManager.Instance == null) {
+                MicrocodeManager.Instance = gameObject.AddComponent<MicrocodeManager>();
+            }
+            if (InstructionManager.Instance == null)
+            {
+                InstructionManager.Instance = gameObject.AddComponent<InstructionManager>();
+            }
+
+            MicrocodeManager.Instance.setMicrocodeTables(microcodeTableDict);
+            InstructionManager.Instance.setInstructions(instructions);
+        }
+        else
+        {
+            Debug.LogWarning($"Save file not found: {filePath}");
+        }
+    }
+
+    public void setNickname() {
+        nickname = inputFieldNickname.text;
     }
 
     public void UpdateScore(int number) {

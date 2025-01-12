@@ -11,6 +11,8 @@ public class MicrocodeExecutor : MonoBehaviour
     private MicrocodeTable MicrocodeTable;
     private MemoryManager MemoryManager;
     private string lastDest;
+    private bool StartMnemonic = true;
+    private bool JumpToLabel = false;
 
     private void Awake()
     {
@@ -48,6 +50,20 @@ public class MicrocodeExecutor : MonoBehaviour
     {
         this.MemoryManager = MemoryManager;
     }
+    public bool GetJumpBool() {
+        return JumpToLabel;
+    }
+    public void SetStartBool(bool start) {
+        this.StartMnemonic = start;
+    }
+    public bool GetStartBool()
+    {
+        return StartMnemonic;
+    }
+    public void SetJumpBool(bool jump)
+    {
+        this.JumpToLabel = jump;
+    }
 
     public bool Execute(int currentAddress, string[] args, int[] argsType)
     {
@@ -61,8 +77,8 @@ public class MicrocodeExecutor : MonoBehaviour
         // Obs³uga ALU
         if (!string.IsNullOrEmpty(row.ALU))
         {
-            int s1 = !string.IsNullOrEmpty(row.S1) ? (row.S1 == "Const" ? (int)row.Const : RegisterManager.GetRegisterValue(row.S1)) : 0;
-            int s2 = !string.IsNullOrEmpty(row.S2) ? (row.S2 == "Const" ? (int)row.Const : RegisterManager.GetRegisterValue(row.S2)) : 0;
+            int s1 = !string.IsNullOrEmpty(row.S1) ? (row.S1 == "Const" ? (int)row.Const : row.S1 == "IR" ? 0 : RegisterManager.Instance.GetRegisterValue(row.S1)) : 0;
+            int s2 = !string.IsNullOrEmpty(row.S2) ? (row.S2 == "Const" ? (int)row.Const : row.S2 == "IR" ? 0 : RegisterManager.Instance.GetRegisterValue(row.S2)) : 0;
 
             int result = row.ALU switch
             {
@@ -79,33 +95,44 @@ public class MicrocodeExecutor : MonoBehaviour
                 "S2" => s2,
                 _ => throw new Exception($"Unknown ALU operation: {row.ALU}")
             };
+
             if (!string.IsNullOrEmpty(row.Dest))
             {
-                //Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.GetRegisterValue(row.Dest).ToString());
-                RegisterManager.SetRegisterValue(row.Dest, result);
+                //Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
+                RegisterManager.Instance.SetRegisterValue(row.Dest, result);
                 lastDest = row.Dest;
-                //Debug.Log("Po wykonaniu ALU: row.Dest = " + RegisterManager.GetRegisterValue(row.Dest).ToString());
+                //Debug.Log("Po wykonaniu ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
             }
         }
 
         // Obs³uga skoków
         if (!string.IsNullOrEmpty(row.JCond) && !string.IsNullOrEmpty(row.Adr))
         {
+            int value = row.ALU switch {
+                "S1" => RegisterManager.Instance.GetRegisterValue(row.S1),
+                "S2" => RegisterManager.Instance.GetRegisterValue(row.S2),
+                _ => 0
+            };
+
+
             bool conditionMet = row.JCond switch
             {
                 "True" => true,
-                "GT" => RegisterManager.GetRegisterValue(row.S1) > 0,
-                "LT" => RegisterManager.GetRegisterValue(row.S1) < 0,
-                "GE" => RegisterManager.GetRegisterValue(row.S1) >= 0,
-                "LE" => RegisterManager.GetRegisterValue(row.S1) <= 0,
-                "EQ" => RegisterManager.GetRegisterValue(row.S1) == 0,
+                "GT" => value > 0,
+                "LT" => value < 0,
+                "GE" => value >= 0,
+                "LE" => value <= 0,
+                "EQ" => value == 0,
                 _ => false
             };
 
             if (conditionMet)
             {
-                Debug.Log("Nastapilby skok w tym miejscu");
+                StartMnemonic = true;
                 //currentAddress = int.Parse(row.Adr, System.Globalization.NumberStyles.HexNumber);
+            }
+            else {
+                JumpToLabel = false;
             }
         }
         // Obs³uga Mem
@@ -115,13 +142,13 @@ public class MicrocodeExecutor : MonoBehaviour
             switch (row.Mem)
             {
                 case "Read":
-                    memoryIndex = RegisterManager.GetRegisterValue(row.MAdr);
+                    memoryIndex = RegisterManager.Instance.GetRegisterValue(row.MAdr);
                     value = MemoryManager.ReadInt(memoryIndex);
-                    RegisterManager.SetRegisterValue(row.MDest, value);
+                    RegisterManager.Instance.SetRegisterValue(row.MDest, value);
                     break;
                 case "Write":
-                    memoryIndex = RegisterManager.GetRegisterValue(row.MAdr);
-                    value = RegisterManager.GetRegisterValue(row.MDest);
+                    memoryIndex = RegisterManager.Instance.GetRegisterValue(row.MAdr);
+                    value = RegisterManager.Instance.GetRegisterValue(row.MDest);
                     MemoryManager.WriteInt(memoryIndex, value);
                     break;
                 default:
@@ -135,32 +162,32 @@ public class MicrocodeExecutor : MonoBehaviour
             switch (row.Regs)
             {
                 case "RR":
-                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(args[0]));
-                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(args[1]));
+                    RegisterManager.Instance.SetRegisterValue("A", RegisterManager.Instance.GetRegisterValue(args[0]));
+                    RegisterManager.Instance.SetRegisterValue("B", RegisterManager.Instance.GetRegisterValue(args[1]));
                     break;
                 case "RAF3":
-                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(args[2]));
+                    RegisterManager.Instance.SetRegisterValue("A", RegisterManager.Instance.GetRegisterValue(args[2]));
                     break;
                 case "RAF4":
-                    RegisterManager.SetRegisterValue("A", RegisterManager.GetRegisterValue(args[3]));
+                    RegisterManager.Instance.SetRegisterValue("A", RegisterManager.Instance.GetRegisterValue(args[3]));
                     break;
                 case "RBF3":
-                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(args[2]));
+                    RegisterManager.Instance.SetRegisterValue("B", RegisterManager.Instance.GetRegisterValue(args[2]));
                     break;
                 case "RBF4":
-                    RegisterManager.SetRegisterValue("B", RegisterManager.GetRegisterValue(args[3]));
+                    RegisterManager.Instance.SetRegisterValue("B", RegisterManager.Instance.GetRegisterValue(args[3]));
                     break;
                 case "WF1":
-                    RegisterManager.SetRegisterValue(args[0], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.Instance.SetRegisterValue(args[0], RegisterManager.Instance.GetRegisterValue(lastDest));
                     break;
                 case "WF2":
-                    RegisterManager.SetRegisterValue(args[1], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.Instance.SetRegisterValue(args[1], RegisterManager.Instance.GetRegisterValue(lastDest));
                     break;
                 case "WF3":
-                    RegisterManager.SetRegisterValue(args[2], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.Instance.SetRegisterValue(args[2], RegisterManager.Instance.GetRegisterValue(lastDest));
                     break;
                 case "WF4":
-                    RegisterManager.SetRegisterValue(args[3], RegisterManager.GetRegisterValue(lastDest));
+                    RegisterManager.Instance.SetRegisterValue(args[3], RegisterManager.Instance.GetRegisterValue(lastDest));
                     break;
                 default:
                     break;

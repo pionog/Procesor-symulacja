@@ -16,6 +16,10 @@ public class ViewcodeManager : MonoBehaviour
     public GameObject ViewcodeGlobalManager;
     public TMP_Dropdown dropdown;
 
+    public List<string[]> getInstructionList() {
+        return instructionList;
+    }
+
     void OnEnable() {
         List<string> instructionsToDelete = ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().getInstructionsToDelete();
 
@@ -37,7 +41,7 @@ public class ViewcodeManager : MonoBehaviour
         int index = 0;
         
 
-        foreach (var instruction in instructionList)
+        foreach (var instruction in InstructionManager.Instance.getInstructionList())
         {
             // Tworzenie głównego kontenera dla wiersza
             GameObject rowContainer = new GameObject("RowContainer");
@@ -85,9 +89,10 @@ public class ViewcodeManager : MonoBehaviour
                 foreach (string[] s in instructionList) {
                     list.Add(s[2]);
                 }
-                newText = TextParser.indicateErrors(newText, list);
+                newText = TextParser.IndicateErrors(newText, list);
                 instruction[1] = newText;
                 instructionInputField.text = newText;
+                InstructionManager.UpdateIR();
             });
 
 
@@ -194,9 +199,9 @@ public class ViewcodeManager : MonoBehaviour
         Debug.Log($"Usuwanie instrukcji: {instruction}");
 
         // Usuń instrukcję z listy
-        if (instructionList.Contains(instruction)){
-            instructionList.Remove(instruction);
-            InstructionManager.RemoveInstruction(instruction);
+        if (InstructionManager.Instance.getInstructionList().Contains(instruction)){
+            InstructionManager.Instance.getInstructionList().Remove(instruction);
+            InstructionManager.Instance.RemoveInstruction(instruction);
         }
         else{
             Debug.LogWarning($"Instrukcja '{instruction}' nie istnieje na li�cie.");
@@ -210,8 +215,8 @@ public class ViewcodeManager : MonoBehaviour
 
     public void RemoveAllInstructions(string instruction)
     {
-        instructionList.RemoveAll(i => i[0] == instruction);
-        InstructionManager.RemoveInstructionList(instruction);
+        InstructionManager.Instance.getInstructionList().RemoveAll(i => i[0] == instruction);
+        InstructionManager.Instance.RemoveInstructionList(instruction);
         dropdown.value = 0; // prevents dropdown value to be out of range
         createListOfInstructions();
     }
@@ -219,41 +224,43 @@ public class ViewcodeManager : MonoBehaviour
     public void AddNewInstruction(string instruction)
     {
         string[] newInstruction = new string[] { instruction, "", "" };
-        instructionList.Add(newInstruction);
-        InstructionManager.AddInstruction(newInstruction);
+        InstructionManager.Instance.getInstructionList().Add(newInstruction);
+        InstructionManager.Instance.AddInstruction(newInstruction);
         createListOfInstructions();
     }
 
     void pushInstructionUp(int index){
-        if (index <= 0 || index >= instructionList.Count)
+        List<string[]> lista = InstructionManager.Instance.getInstructionList();
+        if (index <= 0 || index >= lista.Count)
         {
             Debug.Log("Swap up not possible. Index out of range." + index.ToString());
             return;
         }
 
-        string[] temp = instructionList[index];
+        string[] temp = lista[index];
 
-        instructionList[index] = instructionList[index - 1];
-        instructionList[index - 1] = temp;
+        lista[index] = lista[index - 1];
+        lista[index - 1] = temp;
 
-        InstructionManager.Swap(index - 1, index);
+        InstructionManager.Instance.Swap(index - 1, index);
 
         createListOfInstructions();
     }
 
     void pushInstructionDown(int index){
-        if (index < 0 || index >= instructionList.Count - 1)
+        List<string[]> lista = InstructionManager.Instance.getInstructionList();
+        if (index < 0 || index >= lista.Count - 1)
         {
             Debug.Log("Swap down not possible. Index out of range.");
             return;
         }
 
-        string[] temp = instructionList[index];
+        string[] temp = lista[index];
 
-        instructionList[index] = instructionList[index + 1];
-        instructionList[index + 1] = temp;
+        lista[index] = lista[index + 1];
+        lista[index + 1] = temp;
 
-        InstructionManager.Swap(index, index + 1);
+        InstructionManager.Instance.Swap(index, index + 1);
 
         createListOfInstructions();
     }
