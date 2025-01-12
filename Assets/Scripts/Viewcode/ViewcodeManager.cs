@@ -41,7 +41,7 @@ public class ViewcodeManager : MonoBehaviour
         int index = 0;
         
 
-        foreach (var instruction in instructionList)
+        foreach (var instruction in InstructionManager.Instance.getInstructionList())
         {
             // Tworzenie głównego kontenera dla wiersza
             GameObject rowContainer = new GameObject("RowContainer");
