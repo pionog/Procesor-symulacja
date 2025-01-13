@@ -6,9 +6,9 @@ using UnityEngine;
 
 public class RegisterManager : MonoBehaviour
 {
-    public static RegisterManager Instance { get; private set; }
-    public Dictionary<string, Register> SingleRegisters { get; private set; }
-    public RegisterGroup GeneralPurposeRegisters { get; private set; }
+    public static RegisterManager Instance { get; set; }
+    public Dictionary<string, Register> SingleRegisters { get; set; }
+    public RegisterGroup GeneralPurposeRegisters { get; set; }
 
     private void Awake()
     {
@@ -27,7 +27,7 @@ public class RegisterManager : MonoBehaviour
     /// <summary>
     /// Inicjalizuje rejestry.
     /// </summary>
-    private void InitializeRegisters()
+    public void InitializeRegisters()
     {
         // Inicjalizacja indywidualnych rejestrów
         SingleRegisters = new Dictionary<string, Register>

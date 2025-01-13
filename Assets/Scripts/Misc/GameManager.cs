@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using Newtonsoft.Json;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -120,8 +121,6 @@ public class GameManager : MonoBehaviour
             string registerText = $"{register.Name}: {register.Value.ToString("X8")}"; // Wy�wietlenie w formacie HEX (np. 00000000)
             AddRegisterToContent(register.Name, registerText);
         }
-        RegisterManager.SetRegisterValue("MAR", 16);
-        RegisterManager.SetRegisterValue("MDR", 305419896);
 
         UpdateInputFields();
     }
@@ -187,7 +186,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"Rejestr o nazwie {registerName} ju� istnieje w widoku.");
+            //Debug.LogWarning($"Rejestr o nazwie {registerName} ju� istnieje w widoku.");
         }
     }
 
@@ -388,25 +387,53 @@ public class GameManager : MonoBehaviour
         Score.text = gameScore.ToString();
     }
 
+    public void RestartGame() {
+        MemoryManager.Instance.ResetMemory();
+        RegisterManager.Instance.InitializeRegisters();
+        RegisterManager.SetRegisterValue("A", 0);
+        RegisterManager.SetRegisterValue("B", 0);
+        RegisterManager.SetRegisterValue("C", 0);
+        RegisterManager.SetRegisterValue("TMP1", 0);
+        RegisterManager.SetRegisterValue("TMP2", 0);
+        RegisterManager.SetRegisterValue("uAR", 0);
+        RegisterManager.SetRegisterValue("PC", 0);
+        RegisterManager.SetRegisterValue("IR", 0);
+        RegisterManager.SetRegisterValue("MAR", 0);
+        RegisterManager.SetRegisterValue("MDR", 0);
+        RegisterManager.GeneralPurposeRegisters = new RegisterGroup("R", 32);
+        MicrocodeExecutor.Instance.SetCurrentInstruction(0);
+        MicrocodeExecutor.Instance.SetStartBool(true);
+        gameScore = 0;
+        Score.text = gameScore.ToString();
+        inputFieldIR.text = "";
+        UpdateInputFields();
+        UpdateRegisterDisplay();
+        Debug.Log("Resetowanie gry");
+    }
+
     public int ExecuteMicrocode(int steps) {
         int currentMicrocodeRow = CurrentMicrocodeRow;
         //Debug.Log("Obecny wiersz to: " +  currentMicrocodeRow.ToString());
         int currentInstruction = MicrocodeExecutor.Instance.GetCurrentInstruction() / 4;
+        inputFieldIR.text = InstructionManager.Instance.GetInstruction(currentInstruction)[0] + " " + InstructionManager.Instance.GetInstruction(currentInstruction)[1];
         //Debug.Log("Instrukcja numer: " + currentInstruction.ToString());
 
         int currentStep = 0;
         string[] instructionArray;
         string mnemonic;
         int lastStepIndex;
+        bool changedState = false;
         while (currentStep < steps)
         {
             instructionArray = InstructionManager.Instance.GetInstruction(currentInstruction);
             mnemonic = instructionArray[0];
             string[] args = TextParser.SplitText(instructionArray[1]);
+            
+            
             int[] argsType = TextParser.AnalyzeWords(args);
             MicrocodeTable currentTable;
             bool isStart = MicrocodeExecutor.Instance.GetStartBool();
-            bool changedState = false;
+            
             if (isStart)
             {
                 currentTable = MicrocodeManager.Instance.GetMicrocodeTable("START");
@@ -418,21 +445,49 @@ public class GameManager : MonoBehaviour
             while (currentMicrocodeRow < lastStepIndex)
             {
                 MicrocodeExecutor.Instance.SetMicrocodeTable(currentTable);
+                string insStr = " ";
+                foreach (var arg in args) { insStr += arg + " "; };
+                Debug.Log(mnemonic + insStr);
+                string regCon = "";
+                int index = 0;
+                foreach (var arg in argsType) {
+                    if (arg == 0)
+                    {
+                        regCon += args[index] + ": ";
+                        regCon += RegisterManager.Instance.GetRegisterValue(args[index]) + "\n";
+                    }
+                    index++;
+                }
+                Debug.Log(regCon);
                 MicrocodeExecutor.Instance.Execute(currentMicrocodeRow, args, argsType);
                 currentMicrocodeRow++;
                 CurrentMicrocodeRow++;
                 currentStep++;
+                if (changedState) {
+                    // at this moment if it is a cyclic execution first row of START mnemonic must be done
+                    currentInstruction = MicrocodeExecutor.Instance.GetCurrentInstruction() / 4;
+                    instructionArray = InstructionManager.Instance.GetInstruction(currentInstruction);
+                    mnemonic = instructionArray[0];
+                    args = TextParser.SplitText(instructionArray[1]);
+                    argsType = TextParser.AnalyzeWords(args);
+                    changedState = false;
+                }
                 if (!isStart && MicrocodeExecutor.Instance.GetStartBool()){
                     Debug.Log("Przechodze do mnemonika START");
                     changedState = true;
                     break;
                 }
-                if (currentStep == steps) break;
+                if (currentStep == steps) {
+                    UpdateInputFields();
+                    inputFieldIR.text = InstructionManager.Instance.GetInstruction(currentInstruction)[0] + " " + InstructionManager.Instance.GetInstruction(currentInstruction)[1];
+                    break; 
+                }
             }
             if ((currentMicrocodeRow == lastStepIndex)||changedState)
             {
                 currentMicrocodeRow = 0;
                 CurrentMicrocodeRow = 0;
+                currentInstruction = MicrocodeExecutor.Instance.GetCurrentInstruction() / 4;
             }
         }
         return currentStep;

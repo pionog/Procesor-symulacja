@@ -65,7 +65,7 @@ public class TextParser
         Regex registerRegex = new Regex(@"^R[0-9]{1,2}$"); // Dopasowuje rejestry R0-R32
         Regex constantRegex = new Regex(@"^0X[0-9A-Fa-f]+$"); // Dopasowuje liczby szesnastkowe (np. 0x03C)
         Regex constantDecimalRegex = new Regex(@"^\d+$"); // Dopasowuje liczby dziesiatkowe
-        Regex offsetRegex = new Regex(@" ^ 0X[0-9A-Fa-f]+\s*\(R[0-9]{1,2}\)$"); // Dopasowuje liczby z przesuniêciem (np. 0x0300(R1))
+        Regex offsetRegex = new Regex(@"^0X[0-9A-Fa-f]+\s*\(R[0-9]{1,2}\)$"); // Dopasowuje liczby z przesuniêciem (np. 0x0300(R1))
         Regex labelRegex = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]*$"); // Dopasowuje etykiety (np. secondLoop)
 
         foreach (var word in words)
@@ -91,6 +91,7 @@ public class TextParser
             }
             else
             {
+                Debug.Log(trimmedWord);
                 types.Add(4);
                 //throw new Exception($"Nieznany typ: {trimmedWord}");
             }
