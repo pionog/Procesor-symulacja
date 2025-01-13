@@ -18,6 +18,12 @@ public class InstructionManager : MonoBehaviour
         return instructionList;
     }
 
+    /// <summary>
+    /// Ustawianie listy instrukcji
+    /// </summary>
+    /// <param name="instructions">
+    /// Lista instrukcji
+    /// </param>
     public void setInstructions(List<string[]> instructions) {
         instructionList = instructions;
         int len = instructionList.Count;
@@ -43,6 +49,12 @@ public class InstructionManager : MonoBehaviour
             DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
         }
     }
+    /// <summary>
+    /// Dodawanie nowej instrukcji na liście instrukcji
+    /// </summary>
+    /// <param name="instruction">
+    /// Instrukcja do dodania na listę instrukcji
+    /// </param>
     public void AddInstruction(string[] instruction) {
         Instance.getInstructionList().Add(instruction);
         int originIndex = Instance.getInstructionList().IndexOf(instruction);
@@ -68,9 +80,14 @@ public class InstructionManager : MonoBehaviour
             IR = Int32.Parse(parts[0].Remove(0, 2), System.Globalization.NumberStyles.HexNumber);
         }
         registersList.Add(new int[] { originIndex * 4, IR });
-        //Debug.Log((originIndex * 4).ToString() + ", " +IR.ToString());
     }
 
+    /// <summary>
+    /// Usuwanie wskazanej instrukcji
+    /// </summary>
+    /// <param name="instruction">
+    /// Instrukcja do usunięcia z listy instrukcji
+    /// </param>
     public void RemoveInstruction(string[] instruction) { 
         int index = Instance.getInstructionList().IndexOf(instruction);
         Instance.getInstructionList().Remove(instruction);
@@ -78,15 +95,21 @@ public class InstructionManager : MonoBehaviour
         UpdateIR();
     }
 
-    public void RemoveInstructionList(string instruction) {
-        Instance.getInstructionList().RemoveAll(i => i[0] == instruction);
+    /// <summary>
+    /// Usuwanie wszystkich instrukcji związanych z danym mnemonikiem
+    /// </summary>
+    /// <param name="mnemonic">
+    /// Mnemonik, którego tyczą się dane instrukcje
+    /// </param>
+    public void RemoveInstructionList(string mnemonic) {
+        Instance.getInstructionList().RemoveAll(i => i[0] == mnemonic);
         var instructions = Instance.getInstructionList()
             .Where(array => array.Length > 2)
             .Select(array => array[0])
             .ToList();
         int[] indexes = instructions
             .Select((value, index) => new { value, index }) // Sparowanie warto�ci z indeksami
-            .Where(pair => pair.value == instruction)       // Filtrujemy elementy, kt�re pasuj� do instruction
+            .Where(pair => pair.value == mnemonic)       // Filtrujemy elementy, kt�re pasuj� do instruction
             .Select(pair => pair.index)                    // Wybieramy indeksy
             .ToArray();
         foreach (var index in indexes.OrderByDescending(i => i)) // Sortowanie malej�co
@@ -98,11 +121,31 @@ public class InstructionManager : MonoBehaviour
         }
         UpdateIR();
     }
+    /// <summary>
+    /// Pobieranie instrukcji na podstawie jej pozycji na liście instrukcji
+    /// </summary>
+    /// <param name="index">
+    /// Numer indeksu szukanej instrukcji
+    /// </param>
+    /// <returns>
+    /// <c>string[]</c> Wskazana instrukcja
+    /// </returns>
     public string[] GetInstruction(int index) { 
         return instructionList[index];
     }
 
-
+    /// <summary>
+    /// Zmienianie pozycjami poszczególnych instrukcji
+    /// </summary>
+    /// <param name="first">
+    /// Numer indeksu pierwszej instrukcji na liście instrukcji
+    /// </param>
+    /// <param name="second">
+    /// Numer indeksu drugiej instrukcji na liście instrukcji
+    /// </param>
+    /// <exception cref="Exception">
+    /// Numer indeksu wychodzący poza możliwy obszar na liście
+    /// </exception>
     public void Swap(int first, int second) { 
         if (first == second) return;
         int len = Instance.getInstructionList().Count - 1;
@@ -126,6 +169,9 @@ public class InstructionManager : MonoBehaviour
         Debug.Log("Pomyslnie zamieniono pozycje na liscie instrukcji.");
     }
 
+    /// <summary>
+    /// Aktualizowanie wartości IR dla każdej instrukcji na liście instrukcji
+    /// </summary>
     public void UpdateIR()
     {
         if (MemoryManager.Instance == null)
@@ -167,6 +213,18 @@ public class InstructionManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Obliczanie wartości potrzebnej do prawidłowego rozpoznania instrukcji przez procesor
+    /// </summary>
+    /// <param name="label">
+    /// Etykieta instrukcji, do której ma nastąpić skok
+    /// </param>
+    /// <param name="originIndex">
+    /// Numer indeksu instrukcji na liście instrukcji, od której ma zostać wykonany skok i dla której obliczana jest wartość
+    /// </param>
+    /// <returns>
+    /// <c>int</c> wartość IR
+    /// </returns>
     public int CalculateIR(string label, int originIndex) {
         var LabelsList = Instance.getInstructionList()
             .Where(array => array.Length > 2)
@@ -188,6 +246,12 @@ public class InstructionManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Reprezentacja tekstowa poszczególnych instrukcji
+    /// </summary>
+    /// <returns>
+    /// <c>string</c> z wypisanymi po kolei instrukcjami
+    /// </returns>
     public override string ToString()
     {
         string result = "";

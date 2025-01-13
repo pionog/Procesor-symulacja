@@ -21,6 +21,9 @@ public class MemoryManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Inicjalizowanie obszaru pamiêci
+    /// </summary>
     public void InitializeMemory()
     {
         memory = new byte[memorySize];
@@ -28,6 +31,9 @@ public class MemoryManager : MonoBehaviour
         Debug.Log("Pamiêæ zosta³a zainicjalizowana.");
     }
 
+    /// <summary>
+    /// Czyszczenie pamiêci tymczasowej
+    /// </summary>
     public void ResetMemory() {
         for (int i = 512; i < memorySize; i = i + 4) {
             WriteInt(i, 0);
@@ -42,12 +48,26 @@ public class MemoryManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Pobieranie rozmiaru obszaru pamiêci
+    /// </summary>
+    /// <returns>
+    /// <c>int</c>
+    /// </returns>
     public int GetMemorySize()
     {
         return memory.Length;
     }
 
-    // Przyk³adowa metoda do zapisu i odczytu
+    /// <summary>
+    /// Zapisywanie do pamiêci bajtu
+    /// </summary>
+    /// <param name="address">
+    /// Adres do którego nale¿y zapisaæ liczbê
+    /// </param>
+    /// <param name="value">
+    /// Wartoœæ do zapisania w pamiêci
+    /// </param>
     public void WriteByte(int address, byte value)
     {
         if (address < 0 || address >= memory.Length)
@@ -58,6 +78,15 @@ public class MemoryManager : MonoBehaviour
         memory[address] = value;
     }
 
+    /// <summary>
+    /// Odczytytwanie z pamiêci bajtu
+    /// </summary>
+    /// <param name="address">
+    /// Adres z którego pobierana jest bajt
+    /// </param>
+    /// <returns>
+    /// <c>byte</c>
+    /// </returns>
     public byte ReadByte(int address)
     {
         if (address < 0 || address >= memory.Length)
@@ -68,7 +97,15 @@ public class MemoryManager : MonoBehaviour
         return memory[address];
     }
 
-    // Zapisuje int do pamiêci (4 bajty)
+    /// <summary>
+    /// Zapisywanie do pamiêci liczby ca³kowitej (cztery bajty)
+    /// </summary>
+    /// <param name="address">
+    /// Adres do którego nale¿y zapisaæ liczbê
+    /// </param>
+    /// <param name="value">
+    /// Wartoœæ do zapisania w pamiêci
+    /// </param>
     public void WriteInt(int address, int value)
     {
         if (address < 0 || address + 3 >= memory.Length)
@@ -83,6 +120,15 @@ public class MemoryManager : MonoBehaviour
         memory[address + 3] = (byte)((value >> 24) & 0xFF); // Bajt 3 (MSB)
     }
 
+    /// <summary>
+    /// Odczytytwanie z pamiêci liczby ca³kowitej (cztery bajty)
+    /// </summary>
+    /// <param name="address">
+    /// Adres z którego pobierana jest liczba ca³kowita
+    /// </param>
+    /// <returns>
+    /// <c>int</c>
+    /// </returns>
     public int ReadInt(int address)
     {
         if (address < 0 || address + 3 >= memory.Length)

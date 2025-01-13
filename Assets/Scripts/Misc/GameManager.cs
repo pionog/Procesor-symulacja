@@ -66,6 +66,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Inicjalizowanie gry
+    /// </summary>
     private void InitializeGame()
     {
         Debug.Log("Initializing game...");
@@ -86,19 +89,27 @@ public class GameManager : MonoBehaviour
         Score.text = gameScore.ToString();
     }
 
+    /// <summary>
+    /// Rozpoczęcie gry
+    /// </summary>
     public void StartGame()
     {
         Debug.Log("Game Started!");
         // Logic for starting the game
     }
 
+    /// <summary>
+    /// Zakończenie gry
+    /// </summary>
     public void EndGame()
     {
         Debug.Log("Game Over!");
         // Logic for ending the game
     }
 
-
+    /// <summary>
+    /// Tworzenie i wypełnianie rejestrów
+    /// </summary>
     private void PopulateRegisters()
     {
         if (RegisterManager.Instance == null)
@@ -125,17 +136,19 @@ public class GameManager : MonoBehaviour
         UpdateInputFields();
     }
 
+    /// <summary>
+    /// Aktualizowanie pól wyświetlających zawartość poszczególnych rejestrów
+    /// </summary>
     public void UpdateRegisterDisplay()
     {
-        // Pobierz aktualne rejestry
         var generalPurposeRegisters = this.RegisterManager.GeneralPurposeRegisters.GetAllRegisters();
 
         foreach (var register in generalPurposeRegisters)
         {
-            // Sprawd�, czy dany rejestr jest wy�wietlany
+            // Sprawdzanie, czy dany rejestr jest wyświetlany
             if (registerTexts.TryGetValue(register.Name, out TMP_Text tmpText))
             {
-                // Aktualizuj warto�� tekstu
+                // Aktualizowanie wartości tekstu
                 tmpText.text = $"{register.Name}: {register.Value.ToString("X8")}";
             }
             else
@@ -145,19 +158,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Dodawanie do pola jedynej instancji MemoryManager
+    /// </summary>
     private void PopulateMemory() {
         this.MemoryManager = MemoryManager.Instance;
     }
+    /// <summary>
+    /// Dodawanie do pola jedynej instancji MicrocodeManager
+    /// </summary>
     private void PopulateMicrocode() {
         this.MicrocodeManager = MicrocodeManager.Instance;
     }
+    /// <summary>
+    /// Dodawanie do pola jedynej instancji InstructionManager
+    /// </summary>
     private void PopulateInstruction() { 
         this.InstructionManager = InstructionManager.Instance;
     }
+    /// <summary>
+    /// Dodawanie do pola jedynej instancji MicrocodeExecutor
+    /// </summary>
     private void PopulateMicrocodeExecutor() {
         this.MicrocodeExecutor = MicrocodeExecutor.Instance;
     }
 
+    /// <summary>
+    /// Dodawanie nowego rejestru do wyświetlania
+    /// </summary>
+    /// <param name="registerName">
+    /// Nazwa rejestru, który ma być wyświetlany
+    /// </param>
+    /// <param name="text">
+    /// Reprezentacja tekstowa zawartości dodawanego rejestru
+    /// </param>
     private void AddRegisterToContent(string registerName, string text)
     {
         // Sprawd�, czy prefab zosta� przypisany
@@ -190,10 +224,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Aktualizowanie pól wyświetlających zawartość poszczególnych rejestrów
+    /// </summary>
     private void UpdateInputFields()
     {
-        inputFieldA.text = RegisterManager.Instance.GetRegisterValue("A").ToString("X8");  // "X8" formatuje na 8 cyfr hex
+        // "X8" formatuje na 8 cyfr hex
+        inputFieldA.text = RegisterManager.Instance.GetRegisterValue("A").ToString("X8");  
         inputFieldB.text = RegisterManager.Instance.GetRegisterValue("B").ToString("X8");
         inputFieldC.text = RegisterManager.Instance.GetRegisterValue("C").ToString("X8");
         inputFieldTMP1.text = RegisterManager.Instance.GetRegisterValue("TMP1").ToString("X8");
@@ -201,10 +238,14 @@ public class GameManager : MonoBehaviour
         inputFieldPC.text = RegisterManager.Instance.GetRegisterValue("PC").ToString("X8");
         inputFieldMAR.text = RegisterManager.Instance.GetRegisterValue("MAR").ToString("X8");
         inputFieldMDR.text = RegisterManager.Instance.GetRegisterValue("MDR").ToString("X8");
-
-        //Debug.Log("Zaktualizowano rejestry");
     }
 
+    /// <summary>
+    /// Wykonywanie akcji w grze
+    /// </summary>
+    /// <param name="isForward">
+    /// Określenie, w którym kierunku został wykonany krok w grze
+    /// </param>
     public void MakeAnAction(bool isForward)
     {
         bool cyclesOn = MultipleCyclesToggle.isOn;
@@ -285,6 +326,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Zapisywanie stanu gry
+    /// </summary>
     public void saveGame() {
 
         GameData gameData = new GameData(gameScore, nickname, InstructionManager.Instance.getInstructionList(), MicrocodeManager.Instance.getmicrocodeTables());
@@ -298,6 +342,9 @@ public class GameManager : MonoBehaviour
             + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".json");
     }
 
+    /// <summary>
+    /// Zapisywanie wyniku gry
+    /// </summary>
     public void saveScore() {
         ScoreData scoreData = new ScoreData(gameScore, nickname);
         string jsonData = JsonUtility.ToJson(scoreData, true);
@@ -309,6 +356,10 @@ public class GameManager : MonoBehaviour
             + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".json");
     }
 
+
+    /// <summary>
+    /// Wczytywanie zapisu gry
+    /// </summary>
     public void LoadFromSave() {
         Debug.Log("Wczytuje zapis.");
         welcomePopup.SetActive(false);
@@ -377,16 +428,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Ustawianie pseudonimu gracza na podstawie tekstu wpisanego w odpowiednim polu tekstowym
+    /// </summary>
     public void setNickname() {
         nickname = inputFieldNickname.text;
     }
 
+    /// <summary>
+    /// Aktualizowanie wyniku gry
+    /// </summary>
+    /// <param name="number">
+    /// Liczba kroków o ile ma zostać zmieniony wynik
+    /// </param>
     public void UpdateScore(int number) {
         if (gameScore + number < 0) {Debug.LogError("Niedozwolona operacja!"); return; }
         gameScore += number;
         Score.text = gameScore.ToString();
     }
 
+    /// <summary>
+    /// Restartowanie gry
+    /// </summary>
     public void RestartGame() {
         MemoryManager.Instance.ResetMemory();
         RegisterManager.Instance.InitializeRegisters();
@@ -411,12 +474,20 @@ public class GameManager : MonoBehaviour
         Debug.Log("Resetowanie gry");
     }
 
+
+    /// <summary>
+    /// Wykonywanie mikrokodu
+    /// </summary>
+    /// <param name="steps">
+    /// Liczba kroków, ile powinno zostać wykonanych przez program
+    /// </param>
+    /// <returns>
+    /// <c>Liczba kroków, ile zostało wykonanych przez program</c>
+    /// </returns>
     public int ExecuteMicrocode(int steps) {
         int currentMicrocodeRow = CurrentMicrocodeRow;
-        //Debug.Log("Obecny wiersz to: " +  currentMicrocodeRow.ToString());
         int currentInstruction = MicrocodeExecutor.Instance.GetCurrentInstruction() / 4;
         inputFieldIR.text = InstructionManager.Instance.GetInstruction(currentInstruction)[0] + " " + InstructionManager.Instance.GetInstruction(currentInstruction)[1];
-        //Debug.Log("Instrukcja numer: " + currentInstruction.ToString());
 
         int currentStep = 0;
         string[] instructionArray;
@@ -458,7 +529,6 @@ public class GameManager : MonoBehaviour
                     }
                     index++;
                 }
-                Debug.Log(regCon);
                 MicrocodeExecutor.Instance.Execute(currentMicrocodeRow, args, argsType);
                 currentMicrocodeRow++;
                 CurrentMicrocodeRow++;

@@ -16,6 +16,12 @@ public class ViewcodeManager : MonoBehaviour
     public GameObject ViewcodeGlobalManager;
     public TMP_Dropdown dropdown;
 
+    /// <summary>
+    /// Pobieranie listy instrukcji
+    /// </summary>
+    /// <returns>
+    /// Lista instrukcji składająca się z tablic stringów
+    /// </returns>
     public List<string[]> getInstructionList() {
         return instructionList;
     }
@@ -30,9 +36,11 @@ public class ViewcodeManager : MonoBehaviour
         ViewcodeGlobalManager.GetComponent<ViewcodeGlobalManager>().clearInstructionsToDelete();
     }
 
+    /// <summary>
+    /// Odświeżanie widoku instrukcji
+    /// </summary>
     public void createListOfInstructions()
     {
-        // Usuń istniejące dzieci w Content
         for (int i = content.childCount - 1; i >= 0; i--)
         {
             Destroy(content.GetChild(i).gameObject);
@@ -43,12 +51,11 @@ public class ViewcodeManager : MonoBehaviour
 
         foreach (var instruction in InstructionManager.Instance.getInstructionList())
         {
-            // Tworzenie głównego kontenera dla wiersza
             GameObject rowContainer = new GameObject("RowContainer");
             rowContainer.transform.SetParent(content, false);
 
             RectTransform rowContainerTransform = rowContainer.AddComponent<RectTransform>();
-            rowContainerTransform.sizeDelta = new Vector2(500, 30); // Dopasuj rozmiar kontenera wiersza
+            rowContainerTransform.sizeDelta = new Vector2(500, 30);
 
             HorizontalLayoutGroup rowLayout = rowContainer.AddComponent<HorizontalLayoutGroup>();
             rowLayout.childControlWidth = false;
@@ -56,10 +63,9 @@ public class ViewcodeManager : MonoBehaviour
             rowLayout.childForceExpandWidth = false;
             rowLayout.childForceExpandHeight = false;
 
-            // Utwórz InstructionRow w RowContainer
             GameObject instructionRow = Instantiate(InstructionPrefab, rowContainer.transform);
 
-            // Znajdź komponenty w prefabrykacie InstructionRow
+            // szuaknie komponentow w prefabie InstructionRow
             TMP_InputField labelInputField = instructionRow.transform.Find("LabelInputField").GetComponent<TMP_InputField>();
             Button mnemonicButton = instructionRow.transform.Find("MnemonicButton").GetComponent<Button>();
             TMP_InputField instructionInputField = instructionRow.transform.Find("InstructionInputField").GetComponent<TMP_InputField>();
@@ -70,19 +76,17 @@ public class ViewcodeManager : MonoBehaviour
                 continue;
             }
 
-            // Ustaw wartości w polach i przycisku
-            labelInputField.text = $"{instruction[2]}"; // Możesz zmienić tekst na coś sensownego
-            instructionInputField.text = $"{instruction[1]}"; // Instrukcja dla pola input
 
-            mnemonicButton.GetComponentInChildren<TMP_Text>().text = $"{instruction[0]}"; // Ustaw tekst przycisku
+            labelInputField.text = $"{instruction[2]}";
+            instructionInputField.text = $"{instruction[1]}";
 
-            // Dodaj listenery do pola LabelInputField
+            mnemonicButton.GetComponentInChildren<TMP_Text>().text = $"{instruction[0]}";
+
             labelInputField.onEndEdit.AddListener(newText =>
             {
                 instruction[2] = newText;
             });
 
-            // Dodaj listenery do pola InstructionInputField
             instructionInputField.onEndEdit.AddListener(newText =>
             {
                 List<string> list = new List<string>();
@@ -96,7 +100,6 @@ public class ViewcodeManager : MonoBehaviour
             });
 
 
-            // Dodaj kontener opcji (OptionContainer) w RowContainer
             GameObject optionContainer = new GameObject("OptionContainer");
             optionContainer.transform.SetParent(rowContainer.transform, false);
 
@@ -109,46 +112,38 @@ public class ViewcodeManager : MonoBehaviour
             optionsRowLayout.childControlWidth = true;
             optionsRowLayout.childControlHeight = true;
 
-            optionContainer.SetActive(false); // Ukryj kontener opcji na początku
+            optionContainer.SetActive(false);
 
-            // Obsługa kliknięcia przycisku MnemonicButton
-            int currentIndex = index; // Potrzebne, by zamknąć zmienną w lambdzie
+            int currentIndex = index;
             mnemonicButton.onClick.AddListener(() => ToggleOptions(instruction, optionContainer, currentIndex));
 
             index++;
         }
     }
 
+    /// <summary>
+    /// Przełączanie widoczności opcji danej instrukcji
+    /// </summary>
+    /// <param name="instruction">
+    /// Instrukcja, której tyczą się dane opcje
+    /// </param>
+    /// <param name="optionContainer">
+    /// Kontener opcji wraz z przyciskami
+    /// </param>
+    /// <param name="index">
+    /// Numer pozycji instrukcji na liście instrukcji
+    /// </param>
     private void ToggleOptions(string[] instruction, GameObject optionContainer, int index)
     {
-        // Je�li kontener opcji jest aktywny, ukryj go
         if (optionContainer.activeSelf){
             optionContainer.SetActive(false);
             return;
         }
 
-        // Wyczy�� poprzednie przyciski opcji
         foreach (Transform child in optionContainer.transform){
             Destroy(child.gameObject);
         }
 
-        // Dodaj przyciski opcji
-
-        ////Przycisk edycji
-        //GameObject editButton = Instantiate(optionButtonPrefab, optionContainer.transform);
-
-        //TMP_Text buttonText = editButton.transform.GetComponentInChildren<TMP_Text>();
-
-        //if (buttonText != null){
-        //    buttonText.text = "Edytuj";
-        //}
-        //else{
-        //    Debug.LogError("Prefab przycisku nie ma komponentu TMP_Text jako dziecko!");
-        //}
-
-        //editButton.GetComponent<Button>().onClick.AddListener(() => EditInstructionArguments(instruction));
-
-        //Przycisk usuwania
         GameObject deleteButton = Instantiate(optionButtonPrefab, optionContainer.transform);
 
         TMP_Text deleteButtonText = deleteButton.transform.GetComponentInChildren<TMP_Text>();
@@ -162,7 +157,6 @@ public class ViewcodeManager : MonoBehaviour
 
         deleteButton.GetComponent<Button>().onClick.AddListener(() => RemoveInstruction(instruction, optionContainer));
 
-        //Przycisk shiftu instrukcji w górę
         GameObject upButton = Instantiate(optionButtonPrefab, optionContainer.transform);
 
         TMP_Text upButtonText = upButton.transform.GetComponentInChildren<TMP_Text>();
@@ -176,7 +170,6 @@ public class ViewcodeManager : MonoBehaviour
 
         upButton.GetComponent<Button>().onClick.AddListener(() => pushInstructionUp(index));
 
-        //Przycisk shiftu instrukcji w dół
         GameObject downButton = Instantiate(optionButtonPrefab, optionContainer.transform);
 
         TMP_Text downButtonText = downButton.transform.GetComponentInChildren<TMP_Text>();
@@ -190,15 +183,22 @@ public class ViewcodeManager : MonoBehaviour
 
         downButton.GetComponent<Button>().onClick.AddListener(() => pushInstructionDown(index));
 
-        // Pokaż kontener opcji
         optionContainer.SetActive(true);
     }
 
+    /// <summary>
+    /// Usuwanie wskazanej instrukcji
+    /// </summary>
+    /// <param name="instruction">
+    /// Usuwana instrukcja
+    /// </param>
+    /// <param name="optionContainer">
+    /// Kontener opcji danej instrukcji (przyciski usuwania i przenoszenia pozycji)
+    /// </param>
     public void RemoveInstruction(string[] instruction, GameObject optionContainer)
     {
         Debug.Log($"Usuwanie instrukcji: {instruction}");
 
-        // Usuń instrukcję z listy
         if (InstructionManager.Instance.getInstructionList().Contains(instruction)){
             InstructionManager.Instance.RemoveInstruction(instruction);
         }
@@ -207,26 +207,42 @@ public class ViewcodeManager : MonoBehaviour
             return;
         }
 
-        //Mozna chyba po prostu usuwać ten optionContainer, tak myślę
         Destroy(optionContainer);
         createListOfInstructions();
     }
 
-    public void RemoveAllInstructions(string instruction)
+    /// <summary>
+    /// Usuwanie wszystkich wystąpień danego mnemonika na liście instrukcji
+    /// </summary>
+    /// <param name="mnemonic">
+    /// Mnemonik, którego tyczą się usuwane instrukcje
+    /// </param>
+    public void RemoveAllInstructions(string mnemonic)
     {
-        //InstructionManager.Instance.getInstructionList().RemoveAll(i => i[0] == instruction);
-        InstructionManager.Instance.RemoveInstructionList(instruction);
+        InstructionManager.Instance.RemoveInstructionList(mnemonic);
         dropdown.value = 0; // prevents dropdown value to be out of range
         createListOfInstructions();
     }
 
-    public void AddNewInstruction(string instruction)
+    /// <summary>
+    /// Dodawanie nowej instrukcji na listę instrukcji
+    /// </summary>
+    /// <param name="mnemonic">
+    /// Mnemonik, którego tyczy się dodawana instrukcja
+    /// </param>
+    public void AddNewInstruction(string mnemonic)
     {
-        string[] newInstruction = new string[] { instruction, "", "" };
+        string[] newInstruction = new string[] { mnemonic, "", "" };
         InstructionManager.Instance.AddInstruction(newInstruction);
         createListOfInstructions();
     }
 
+    /// <summary>
+    /// Przesuwanie w górę instrukcji na liście
+    /// </summary>
+    /// <param name="index">
+    /// Numer indeksu instrukcji na liście instrukcji
+    /// </param>
     void pushInstructionUp(int index){
         List<string[]> lista = InstructionManager.Instance.getInstructionList();
         if (index <= 0 || index >= lista.Count)
@@ -235,16 +251,17 @@ public class ViewcodeManager : MonoBehaviour
             return;
         }
 
-        //string[] temp = lista[index];
-
-        //lista[index] = lista[index - 1];
-        //lista[index - 1] = temp;
-
         InstructionManager.Instance.Swap(index - 1, index);
 
         createListOfInstructions();
     }
 
+    /// <summary>
+    /// Przesuwanie w dół instrukcji na liście
+    /// </summary>
+    /// <param name="index">
+    /// Numer indeksu instrukcji na liście instrukcji
+    /// </param>
     void pushInstructionDown(int index){
         List<string[]> lista = InstructionManager.Instance.getInstructionList();
         if (index < 0 || index >= lista.Count - 1)
@@ -252,11 +269,6 @@ public class ViewcodeManager : MonoBehaviour
             Debug.Log("Swap down not possible. Index out of range.");
             return;
         }
-
-        //string[] temp = lista[index];
-
-        //lista[index] = lista[index + 1];
-        //lista[index + 1] = temp;
 
         InstructionManager.Instance.Swap(index, index + 1);
 

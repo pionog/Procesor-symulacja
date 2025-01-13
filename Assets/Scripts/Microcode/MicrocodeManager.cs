@@ -86,17 +86,38 @@ public class MicrocodeManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Uzyskiwanie słownika tabel mikrokodów
+    /// </summary>
+    /// <returns>
+    /// Słownik tabel mikrokodów
+    /// </returns>
     public Dictionary<string, MicrocodeTable> getmicrocodeTables()
     {
         return microcodeTables;
     }
 
+
+    /// <summary>
+    /// Ustawianie tabel mikrokodów
+    /// </summary>
+    /// <param name="tables">
+    /// Słownik tabel mikrokodów
+    /// </param>
     public void setMicrocodeTables(Dictionary<string, MicrocodeTable> tables)
     {
         microcodeTables = tables;
     }
 
-    // Dodawanie istniej�cej tabeli mikrokod�w do s�ownika
+    /// <summary>
+    /// Dodawanie istniejącej tabeli mikrokodów do słownika
+    /// </summary>
+    /// <param name="mnemonic">
+    /// Mnemonik, którego tabela mikrokodów ma zostać dodana do słownika
+    /// </param>
+    /// <param name="table">
+    /// Tabela mikrokodów danego mnemonika
+    /// </param>
     public void AddMicrocodeTable(string mnemonic, MicrocodeTable table)
     {
         if (!microcodeTables.ContainsKey(mnemonic))
@@ -110,7 +131,15 @@ public class MicrocodeManager : MonoBehaviour
         }
     }
 
-    // Pobieranie tabeli mikrokod�w dla danego mnemonika
+    /// <summary>
+    /// Pobieranie tabeli mikrokodów dla danego mnemonika
+    /// </summary>
+    /// <param name="mnemonic">
+    /// Mnemonik, którego tabela mikrokodów ma zostać pobrana
+    /// </param>
+    /// <returns>
+    /// <c>MicrocodeTable</c> tabela mikrokodów wskazanego mnemonika
+    /// </returns>
     public MicrocodeTable GetMicrocodeTable(string mnemonic)
     {
         if (microcodeTables.TryGetValue(mnemonic, out var table))
@@ -123,6 +152,16 @@ public class MicrocodeManager : MonoBehaviour
             return null;
         }
     }
+
+    /// <summary>
+    /// Pobieranie długości wskazanej tabeli mikrokodów
+    /// </summary>
+    /// <param name="mnemonic">
+    /// Mnemonik, którego długość tabeli ma zostać uzyskana
+    /// </param>
+    /// <returns>
+    /// <c>int</c> długość tabeli
+    /// </returns>
     public int GetMicrocodeTableLength(string mnemonic) {
         if (microcodeTables.TryGetValue(mnemonic, out var table))
         {
@@ -135,7 +174,9 @@ public class MicrocodeManager : MonoBehaviour
         }
     }
 
-    // Debugowanie wszystkich tabel mikrokod�w
+    /// <summary>
+    /// Debugowanie menadżera mikrokodów w Unity
+    /// </summary>
     public void DebugAllMicrocodes()
     {
         foreach (var kvp in microcodeTables)

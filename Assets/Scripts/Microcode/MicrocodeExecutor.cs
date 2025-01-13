@@ -26,43 +26,118 @@ public class MicrocodeExecutor : MonoBehaviour
             DontDestroyOnLoad(gameObject); // Ensure this object persists across scenes
         }
     }
-
+    /// <summary>
+    /// Uzyskiwanie menad¿era rejestrów
+    /// </summary>
+    /// <returns>
+    /// Menad¿er rejestrów
+    /// </returns>
     public RegisterManager GetRegisterManager() { 
         return RegisterManager;
     }
+    /// <summary>
+    /// Ustawianie menad¿era rejestrów
+    /// </summary>
+    /// <param name="RegisterManager">
+    /// Menad¿er rejestrów
+    /// </param>
     public void SetRegisterManager(RegisterManager RegisterManager) { 
         this.RegisterManager = RegisterManager;
     }
+    /// <summary>
+    /// Uzyskiwanie menad¿era tabel mikrokodów
+    /// </summary>
+    /// <returns>
+    /// Menad¿er tabel mikrokodów
+    /// </returns>
     public MicrocodeTable GetMicrocodeTable()
     {
         return MicrocodeTable;
     }
+    /// <summary>
+    /// Ustawianie menad¿era tabel mikrokodów
+    /// </summary>
+    /// <param name="MicrocodeTable">
+    /// Menad¿er tabel mikrokodów
+    /// </param>
     public void SetMicrocodeTable(MicrocodeTable MicrocodeTable)
     {
         this.MicrocodeTable = MicrocodeTable;
     }
+    /// <summary>
+    /// Uzyskiwanie menad¿era pamiêci
+    /// </summary>
+    /// <returns>
+    /// Menad¿er pamiêci
+    /// </returns>
     public MemoryManager GetMemoryManager()
     {
         return MemoryManager;
     }
+    /// <summary>
+    /// Ustawianie menad¿era pamiêci
+    /// </summary>
+    /// <param name="MemoryManager">
+    /// Menad¿er pamiêci
+    /// </param>
     public void SetMemoryManager(MemoryManager MemoryManager)
     {
         this.MemoryManager = MemoryManager;
     }
+    /// <summary>
+    /// Ustawianie informacji o tym, czy program aktualnie wykonuje operacjê prze³¹czania siê miêdzy instrukcjami
+    /// </summary>
+    /// <param name="start"></param>
     public void SetStartBool(bool start) {
         this.StartMnemonic = start;
     }
+
+    /// <summary>
+    /// Pobieranie informacji, czy program obecnie wykonuje mechanizm prze³¹czania siê miêdzy instrukcjami
+    /// </summary>
+    /// <returns>
+    /// <c>bool</c> czy program wykonuje mnemonik <c>"START"</c>
+    /// </returns>
     public bool GetStartBool()
     {
         return StartMnemonic;
     }
+
+    /// <summary>
+    /// Pobieranie numeru instrukcji aktualnie rozpatrywanej przez program
+    /// </summary>
+    /// <returns>
+    /// <c>int</c> numer indeksu rozpatrywanej instrukcji
+    /// </returns>
     public int GetCurrentInstruction() { 
         return this.CurrentInstruction;
     }
+    /// <summary>
+    /// Wpisywanie numeru indeksu aktualnie rozpatrywanej instrukcji
+    /// </summary>
+    /// <param name="index">
+    /// Numer indeksu rozpatrywanej instrukcji
+    /// </param>
     public void SetCurrentInstruction(int index) { 
         this.CurrentInstruction = index;
     }
 
+    /// <summary>
+    /// Wykonywanie instrukcji zawartej w tabli mikrokodów. Wykonanie kroku w grze
+    /// </summary>
+    /// <param name="currentAddress">
+    /// Adres wiersza w aktualnej tabeli mikrokodów
+    /// </param>
+    /// <param name="args">
+    /// Lista argumentów instrukcji
+    /// </param>
+    /// <param name="argsType">
+    /// Lista typów argumentów zawartych w zmiennej <c>args</c>
+    /// </param>
+    /// <returns>
+    /// <c>bool</c> Czy program wykona³ operacje zawarte w danym wierszu tabeli mikrokodu
+    /// </returns>
+    /// <exception cref="Exception"></exception>
     public bool Execute(int currentAddress, string[] args, int[] argsType)
     {
         
@@ -98,10 +173,8 @@ public class MicrocodeExecutor : MonoBehaviour
 
             if (!string.IsNullOrEmpty(row.Dest))
             {
-                //Debug.Log("Przed wykonaniem ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
                 if(row.ALU == "MUL") Debug.Log(result.ToString());
                 RegisterManager.Instance.SetRegisterValue(row.Dest, result);
-                //Debug.Log("Po wykonaniu ALU: row.Dest = " + RegisterManager.Instance.GetRegisterValue(row.Dest).ToString());
             }
         }
 
@@ -113,7 +186,6 @@ public class MicrocodeExecutor : MonoBehaviour
                 "S2" => RegisterManager.Instance.GetRegisterValue(row.S2),
                 _ => 0
             };
-            //Debug.Log(value.ToString());
 
             bool conditionMet = row.JCond switch
             {
@@ -128,11 +200,9 @@ public class MicrocodeExecutor : MonoBehaviour
 
             if (conditionMet)
             {
-                //Debug.Log("Wykonuje skok!");
                 StartMnemonic = !StartMnemonic;
             }
             else {
-                //Debug.Log("Falsz!");
             }
         }
         // Obs³uga Mem
@@ -144,12 +214,9 @@ public class MicrocodeExecutor : MonoBehaviour
                 case "Read":
                     
                     memoryIndex = RegisterManager.Instance.GetRegisterValue(row.MAdr);
-                    Debug.Log("memoryIndex: " + memoryIndex.ToString());
                     value = MemoryManager.ReadInt(memoryIndex);
-                    Debug.Log("value: " + value.ToString());
                     RegisterManager.Instance.SetRegisterValue(row.MDest, value);
                     if (StartMnemonic) { 
-                        Debug.Log("Zapisuje w IR liczbe: " + Instance.CurrentInstruction.ToString());
                         Instance.CurrentInstruction = memoryIndex;
                     }
                     break;
@@ -178,7 +245,6 @@ public class MicrocodeExecutor : MonoBehaviour
                 if (argsType[i] == 3) {
                     string[] splitText = args[i].Split("(");
                     string register = splitText[1].Remove(splitText.Length);
-                    Debug.Log("Wyodrebniony rejestr: " + register);
                     regs.Insert(0, register);
                     registers = register + " " + registers; 
 
