@@ -80,6 +80,9 @@ public class MicrocodeManager : MonoBehaviour
                 moveRow = new MicrocodeRow() { Address = 1, JCond = "True", Regs = "WF1" };
                 move.AddRow(moveRow);
                 microcodeTables.Add("MOV", move);
+
+                GameManager.Instance.SetActualMnemonics(GameManager.Instance.GetActualMnemonics());
+                GameManager.Instance.SetDefinedMnemonics(GameManager.Instance.GetDefinedMnemonics());
             }
 
 

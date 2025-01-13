@@ -12,6 +12,7 @@ public class InstructionManager : MonoBehaviour
     private List<string[]> instructionList = new List<string[]>();  // 0 - mnemonic name, 1 - formal registers/const numbers/labels to which is jump, 2 - label
     private List<int[]> registersList = new List<int[]>();  //0 - PC, 1 - IR
     private const int stringsInArray = 3 - 1;
+    private bool NoMoreLeft = false;
     // Start is called before the first frame update
 
     public List<string[]> getInstructionList() {
@@ -50,6 +51,26 @@ public class InstructionManager : MonoBehaviour
         }
     }
     /// <summary>
+    /// Ustawianie informacji czy zostały jeszcze instrukcje do wykonania
+    /// </summary>
+    /// <param name="noMoreLeft">
+    /// 
+    /// </param>
+    public void SetNoMoreLeft(bool noMoreLeft) { 
+        NoMoreLeft = noMoreLeft;
+    }
+
+    /// <summary>
+    /// Uzyskanie informacji czy zostały jeszcze instrukcje do wykonania
+    /// </summary>
+    /// <returns>
+    /// <c>bool</c> informacja o tym, czy zostały jeszcze instrukcje do wykonania
+    /// </returns>
+    public bool GetNoMoreLeft() { 
+        return NoMoreLeft;
+    }
+
+    /// <summary>
     /// Dodawanie nowej instrukcji na liście instrukcji
     /// </summary>
     /// <param name="instruction">
@@ -80,6 +101,8 @@ public class InstructionManager : MonoBehaviour
             IR = Int32.Parse(parts[0].Remove(0, 2), System.Globalization.NumberStyles.HexNumber);
         }
         registersList.Add(new int[] { originIndex * 4, IR });
+        GameManager.Instance.SetActualInstructions(GameManager.Instance.GetActualInstructions());
+        GameManager.Instance.SetDefinedInstructions(GameManager.Instance.GetDefinedInstructions());
     }
 
     /// <summary>
@@ -93,6 +116,7 @@ public class InstructionManager : MonoBehaviour
         Instance.getInstructionList().Remove(instruction);
         registersList.RemoveAt(index);
         UpdateIR();
+        GameManager.Instance.SetActualInstructions(instructionList.Count);
     }
 
     /// <summary>
@@ -120,6 +144,7 @@ public class InstructionManager : MonoBehaviour
             }
         }
         UpdateIR();
+        GameManager.Instance.SetActualInstructions(instructionList.Count);
     }
     /// <summary>
     /// Pobieranie instrukcji na podstawie jej pozycji na liście instrukcji
@@ -130,8 +155,16 @@ public class InstructionManager : MonoBehaviour
     /// <returns>
     /// <c>string[]</c> Wskazana instrukcja
     /// </returns>
-    public string[] GetInstruction(int index) { 
-        return instructionList[index];
+    public string[] GetInstruction(int index)
+    {
+        try
+        {
+            return instructionList[index];
+        }
+        catch {
+            NoMoreLeft = true;
+            return null;
+        }
     }
 
     /// <summary>

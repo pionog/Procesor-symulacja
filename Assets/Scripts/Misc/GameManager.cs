@@ -34,20 +34,40 @@ public class GameManager : MonoBehaviour
     public GameObject label;
     public GameObject architecturePanel;
     public GameObject scoreText;
+    public GameObject summaryPanel;
+    public GameObject tryAgainPanel;
 
     public TMP_Text Score;
+    public TMP_Text Score2;
     private string nickname;
     private int gameScore = 0;
     public Button ClockButton;
     public Button RewindButton;
     public Toggle MultipleCyclesToggle;
     public TMP_InputField Cycles;
+    private int resets = 0;
+    public TMP_Text resetsText;
+    private int definedMnemonics = 0;
+    public TMP_Text definedMnemonicsText;
+    private int definedInstructions = 0;
+    public TMP_Text definedInstructionsText;
+    private int actualMnemonics = 0;
+    public TMP_Text actualMnemonicsText;
+    private int actualInstructions = 0;
+    public TMP_Text actualInstructionsText;
 
     private MicrocodeManager MicrocodeManager;
     private MemoryManager MemoryManager;
     private RegisterManager RegisterManager;
     private InstructionManager InstructionManager;
     private MicrocodeExecutor MicrocodeExecutor;
+    private readonly int[] winCondition = new int[32] 
+    { 
+        0x1,    0x3,    0x6,    0xA,    0xF,    0x15,   0x1C,   0x24, 
+        0x2D,   0x37,   0x42,   0x4E,   0x5B,   0x69,   0x78,   0x88, 
+        0x98,   0xA8,   0xB8,   0xC8,   0xD8,   0xE8,   0xF8,   0x108,
+        0x118,  0x128,  0x138,  0x148,  0x158,  0x168,  0x178,  0x188
+    };
 
     private int CurrentMicrocodeRow = 0;
 
@@ -90,21 +110,78 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Rozpoczęcie gry
+    /// Pobieranie liczby zdefiniowanych mneomników przez całą grę
     /// </summary>
-    public void StartGame()
+    /// <returns>
+    /// <c>int</c> liczba zdefiniowanych mnemoników przez całą grę</returns>
+    public int GetDefinedMnemonics() {
+        return definedMnemonics;
+    }
+    /// <summary>
+    /// Pobieranie liczby zdefiniowanych instrukcji przez całą grę
+    /// </summary>
+    /// <returns>
+    /// <c>int</c> liczba zdefiniowanych instrukcji przez całą grę</returns>
+    public int GetDefinedInstructions()
     {
-        Debug.Log("Game Started!");
-        // Logic for starting the game
+        return definedInstructions;
+    }
+    /// <summary>
+    /// Pobieranie liczby mnemoników w trakcie gry
+    /// </summary>
+    /// <returns>
+    /// <c>int</c> liczba mnemoników w trakcie gry</returns>
+    public int GetActualMnemonics() {
+        return actualMnemonics;
+    }
+    /// <summary>
+    /// Pobieranie liczby instrukcji w trakcie gry
+    /// </summary>
+    /// <returns>
+    /// <c>int</c> liczba instrukcji w trakcie gry</returns>
+    public int GetActualInstructions()
+    {
+        return actualInstructions;
+    }
+    /// <summary>
+    /// Ustawianie liczby zdefiowanych mnemoników przez całą grę
+    /// </summary>
+    /// <param name="number">
+    /// Aktualna liczba zdefiowanych mnemoników przez całą grę
+    /// </param>
+    public void SetDefinedMnemonics(int number) { 
+        definedMnemonics = number;
+    }
+    /// <summary>
+    /// Ustawianie liczby zdefiowanych instrukcji przez całą grę
+    /// </summary>
+    /// <param name="number">
+    /// Aktualna liczba zdefiowanych instrukcji przez całą grę
+    /// </param>
+    public void SetDefinedInstructions(int number)
+    {
+        definedInstructions = number;
+    }
+    /// <summary>
+    /// Ustawianie liczby mnemoników pod koniec gry
+    /// </summary>
+    /// <param name="number">
+    /// Aktualna liczba dostępnych mnemoników w trakcie gry
+    /// </param>
+    public void SetActualMnemonics(int number)
+    {
+        actualMnemonics = number;
     }
 
     /// <summary>
-    /// Zakończenie gry
+    /// Ustawianie liczby instrukcji pod koniec gry
     /// </summary>
-    public void EndGame()
+    /// <param name="number">
+    /// Aktualna liczba dostępnych instrukcji w trakcie gry
+    /// </param>
+    public void SetActualInstructions(int number)
     {
-        Debug.Log("Game Over!");
-        // Logic for ending the game
+        actualInstructions = number;
     }
 
     /// <summary>
@@ -241,6 +318,39 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Pokazanie komunikatu o ukończeniu gry
+    /// </summary>
+    public void ViewSummary() {
+        summaryPanel.SetActive(true);
+        resetsText.text = resets.ToString();
+        definedMnemonicsText.text = definedMnemonics.ToString();
+        definedInstructionsText.text = definedInstructions.ToString();
+        actualMnemonicsText.text = actualMnemonics.ToString();
+        actualInstructionsText.text = actualInstructions.ToString();
+        Score2.text = gameScore.ToString();
+    }
+
+    /// <summary>
+    /// Pokazanie komunikatu o spróbowaniu zagrania w grę ponownie
+    /// </summary>
+    public void ViewTryAgain() {
+        tryAgainPanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// Sprawdzanie czy gracz ukończył grę
+    /// </summary>
+    /// <returns></returns>
+    public bool CheckWin() {
+        for (int i = 0; i < 32; i++) {
+            if (MemoryManager.Instance.ReadInt(0x300 + i * 4) != winCondition[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
     /// Wykonywanie akcji w grze
     /// </summary>
     /// <param name="isForward">
@@ -253,10 +363,34 @@ public class GameManager : MonoBehaviour
         int stepDirection = isForward ? 1 : -1;
         int steps = cyclesOn ? stepDirection * cycles : stepDirection * 1;
         int stepsMade = ExecuteMicrocode(steps);
+        Debug.Log(stepsMade.ToString());
+        
 
         UpdateScore(stepsMade);
         UpdateInputFields();
         UpdateRegisterDisplay();
+
+
+
+        if (InstructionManager.GetNoMoreLeft())
+        {
+            bool isCompleted = CheckWin();
+            if (isCompleted)
+            {
+                tryAgainPanel.SetActive(false);
+                ViewSummary();
+            }
+            else
+            {
+                summaryPanel.SetActive(false);
+                ViewTryAgain();
+            }
+        }
+        else {
+            tryAgainPanel.SetActive(false);
+            summaryPanel.SetActive(false);
+        }
+
     }
 
     [System.Serializable]
@@ -287,26 +421,38 @@ public class GameManager : MonoBehaviour
     {
         public int score;
         public string nickname;
+        public int resets;
+        public int definedMnemonics;
+        public int definedInstructions;
+        public int actualMnemonics;
+        public int actualInstructions;
         public string timestamp;
         public List<List<string>> instructionList;
         public List<MicrocodeTableEntry> microcodeTables;
 
         public GameData() { }
 
-        public GameData(int score, string nickname, List<string[]> instructions, Dictionary<string, MicrocodeTable> microcodeTableDict)
+        public GameData(int score, string nickname, List<string[]> instructions, Dictionary<string, MicrocodeTable> microcodeTableDict, int resets = 0, int definedMnemonics = 0, int definedInstructions = 0, int actualMnemonics = 0, int actualInstructions = 0)
         {
             this.score = score;
             this.nickname = nickname;
+            this.resets = resets;
+            this.actualMnemonics = actualMnemonics;
+            this.actualInstructions = actualInstructions;
+            this.definedInstructions = definedMnemonics;
+            this.definedMnemonics = definedInstructions;
             this.timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 
             this.instructionList = new List<List<string>>();
 
-            foreach (var array in instructions){
+            foreach (var array in instructions)
+            {
                 this.instructionList.Add(new List<string>(array));
             }
             this.microcodeTables = new List<MicrocodeTableEntry>();
 
-            foreach (var kvp in microcodeTableDict){
+            foreach (var kvp in microcodeTableDict)
+            {
                 var entry = new MicrocodeTableEntry(kvp.Key, kvp.Value);
                 this.microcodeTables.Add(entry);
             }
@@ -380,6 +526,11 @@ public class GameManager : MonoBehaviour
 
             nickname = gameData.nickname;
             gameScore = gameData.score;
+            resets = gameData.resets;
+            actualMnemonics = gameData.actualMnemonics;
+            actualInstructions = gameData.actualInstructions;
+            definedInstructions = gameData.definedInstructions;
+            definedMnemonics = gameData.definedMnemonics;
 
             List<List<string>> instructionList = gameData.instructionList;
             List<MicrocodeTableEntry> microcodeTables = gameData.microcodeTables;
@@ -472,6 +623,9 @@ public class GameManager : MonoBehaviour
         UpdateInputFields();
         UpdateRegisterDisplay();
         Debug.Log("Resetowanie gry");
+        resets++;
+        tryAgainPanel.SetActive(false);
+        summaryPanel.SetActive(false);
     }
 
 
@@ -537,6 +691,10 @@ public class GameManager : MonoBehaviour
                     // at this moment if it is a cyclic execution first row of START mnemonic must be done
                     currentInstruction = MicrocodeExecutor.Instance.GetCurrentInstruction() / 4;
                     instructionArray = InstructionManager.Instance.GetInstruction(currentInstruction);
+                    if (instructionArray == null)
+                    {
+                        return currentStep;
+                    }
                     mnemonic = instructionArray[0];
                     args = TextParser.SplitText(instructionArray[1]);
                     argsType = TextParser.AnalyzeWords(args);

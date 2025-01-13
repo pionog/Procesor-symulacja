@@ -106,6 +106,9 @@ public class MicrocodeListManager : MonoBehaviour
 
         // Obs�uga klikni�cia przycisku mnemonika
         newButton.GetComponent<Button>().onClick.AddListener(() => ToggleOptions(mnemonic, optionContainer));
+
+        GameManager.Instance.SetDefinedMnemonics(GameManager.Instance.GetDefinedMnemonics());
+        GameManager.Instance.SetActualMnemonics(GameManager.Instance.GetActualMnemonics());
     }
 
 
