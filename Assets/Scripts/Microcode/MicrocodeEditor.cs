@@ -144,12 +144,10 @@ public class MicrocodeEditor : MonoBehaviour
         }
         if (!MicrocodeTable.GetEditable())
         {
-            ChangeTypeButton.GetComponent<UnityEngine.UI.Button>().interactable = false;
             SaveButton.GetComponent<UnityEngine.UI.Button>().interactable = false;
             AddNewRowButton.GetComponent<UnityEngine.UI.Button>().interactable = false;
         }
         else {
-            ChangeTypeButton.GetComponent<UnityEngine.UI.Button>().interactable = true;
             SaveButton.GetComponent<UnityEngine.UI.Button>().interactable = true;
             AddNewRowButton.GetComponent<UnityEngine.UI.Button>().interactable = true;
         }

@@ -186,6 +186,7 @@ public class MicrocodeListManager : MonoBehaviour
         if (mnemonics.Contains(mnemonic))
         {
             mnemonics.Remove(mnemonic);
+            GameManager.Instance.SetActualMnemonics(mnemonics.Count);
         }
         else
         {
